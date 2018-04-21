@@ -2,7 +2,6 @@ package block;
 
 import java.util.Date;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.ArrayList;
 import java.text.SimpleDateFormat;
 import java.security.MessageDigest;
@@ -81,4 +80,51 @@ public class Block {
         if(isValidNewBlock(newBlock, getLastBlock()))
             this.blockchain.add(newBlock);
     }
+    
+    private Boolean isValidGenesisBlock(Block validateBlock) {
+        return ((this.genesisBlock.index == validateBlock.index) && (this.genesisBlock.hash.equals(validateBlock.hash)) && (this.genesisBlock.previousHash.equals(validateBlock.previousHash)) && (this.genesisBlock.timestamp.equals(validateBlock.timestamp)) && (this.genesisBlock.data.equals(validateBlock.data)));
+    }
+    
+    private Boolean isValidChain(ArrayList<Block> validateBlockchain) {
+        if(!isValidGenesisBlock(validateBlockchain.get(0))) { //Verify if Genesis Block is correct
+            System.out.println("Invalid Genesis Block");
+            return false;
+        }
+        for(int i=1; i < validateBlockchain.size(); i++) { //Verify other blocks
+            if(!isValidNewBlock(validateBlockchain.get(i), validateBlockchain.get(i-1)))
+                return false;
+        }
+        
+        return true;    
+    }
+    
+    private Boolean addBlockToChain(Block newBlock) {
+        if(isValidNewBlock(newBlock, getLastBlock())) {
+            this.blockchain.add(newBlock);
+            return true;
+        }
+        return false;
+    }
+    
+    private void replaceChain(ArrayList<Block> newBlocks) {
+        if(isValidChain(newBlocks) && (newBlocks.size() > getBlockchain().size())) {
+            System.out.println("Blockchain received is valid, the current blockchain was replaced by the received blockchain");
+            this.blockchain = newBlocks;
+            //FUNCTION TO BROADCAST THIS, UNDONE
+        }
+        else
+            System.out.println("Received Blockchain Invalid");
+    }
+    
+    private Block generateNextBlock(String blockData) {
+        Block previousBlock = getLastBlock();
+        int nextIndex = previousBlock.index + 1;
+        Date nextTimestamp = new Date(System.currentTimeMillis());
+        String nextHash = generateHash(nextIndex, previousBlock.hash, nextTimestamp, blockData);
+        Block newBlock = new Block(nextIndex, nextHash, previousBlock.hash, nextTimestamp, blockData);
+        addBlock(newBlock);
+        //BroadcastLatest UNDONE
+        return newBlock;
+    }
+    
 }

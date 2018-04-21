@@ -1,4 +1,4 @@
-package block;
+package blockchain;
 
 import java.util.Date;
 import java.util.Base64;
@@ -6,20 +6,10 @@ import java.util.ArrayList;
 import java.text.SimpleDateFormat;
 import java.security.MessageDigest;
 
-public class Block {
-    public Integer index;
-    public String hash;
-    public String previousHash;
-    public Date timestamp;
-    public String data;
+public class Blockchain {
     private ArrayList<Block> blockchain = new ArrayList<Block>();
     
-    Block (int index, String hash, String previousHash, Date timestamp, String data) {
-        this.index = index;
-        this.hash = hash;
-        this.previousHash = previousHash;
-        this.timestamp = timestamp;
-        this.data = data;
+    Blockchain() {
         this.blockchain.add(genesisBlock);
     }
     

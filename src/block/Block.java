@@ -3,6 +3,7 @@ package block;
 import java.util.Date;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.text.SimpleDateFormat;
 import java.security.MessageDigest;
 
@@ -12,6 +13,7 @@ public class Block {
     public String previousHash;
     public Date timestamp;
     public String data;
+    private ArrayList<Block> blockchain = new ArrayList<Block>();
     
     Block (int index, String hash, String previousHash, Date timestamp, String data) {
         this.index = index;
@@ -19,18 +21,17 @@ public class Block {
         this.previousHash = previousHash;
         this.timestamp = timestamp;
         this.data = data;
+        this.blockchain.add(genesisBlock);
     }
     
     final public Block genesisBlock = new Block(0, "816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7", "", new Date(System.currentTimeMillis()), "Genesis Block"); //First Block into Chain
     
-    private Block[] blockchain = {this.genesisBlock}; //Add Genesis Block into Chain
-    
-    public Block[] getBlockchain() { //Get all blocks
+    public ArrayList<Block> getBlockchain() { //Get all blocks
         return this.blockchain;
     }
     
     public Block getLastBlock() { //Get the last block added
-        return this.blockchain[this.blockchain.length - 1];
+        return this.blockchain.get(this.blockchain.size() - 1);
     }
     
     private String generateHash(int index, String previousHash, Date timestamp, String data) { //Generate a Hash in accord with parameters of the block
@@ -78,6 +79,6 @@ public class Block {
     
     private void addBlock(Block newBlock) {
         if(isValidNewBlock(newBlock, getLastBlock()))
-            this.blockchain.push(newBlock);
+            this.blockchain.add(newBlock);
     }
 }

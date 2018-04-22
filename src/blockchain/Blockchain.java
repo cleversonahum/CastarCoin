@@ -7,11 +7,12 @@ import java.text.SimpleDateFormat;
 import java.security.MessageDigest;
 
 public class Blockchain {
-    private ArrayList<Block> blockchain = new ArrayList<Block>();
     
-    Blockchain() {
+    public Blockchain() {
         this.blockchain.add(genesisBlock);
     }
+    
+    private ArrayList<Block> blockchain = new ArrayList<Block>();
     
     final public Block genesisBlock = new Block(0, "816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7", "", new Date(System.currentTimeMillis()), "Genesis Block"); //First Block into Chain
     
@@ -29,7 +30,7 @@ public class Blockchain {
         String hash="";
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] byteHash = digest.digest(msgHash.getBytes("StandardCharsets.UTF_8"));
+            byte[] byteHash = digest.digest(msgHash.getBytes("UTF-8"));
             hash = Base64.getEncoder().encodeToString(byteHash);
         }
         catch(Exception e){e.printStackTrace();}
@@ -54,11 +55,11 @@ public class Blockchain {
             System.out.println("Invalid Index Number");
             return false;
         }
-        else if (previousBlock.hash != newBlock.previousHash) {
+        else if (!previousBlock.hash.equals(newBlock.previousHash)) {
             System.out.println("Invalid Previous Hash");
             return false;
         }
-        else if (generateHashBlock(newBlock) != newBlock.hash) {
+        else if (!generateHashBlock(newBlock).equals(newBlock.hash)) {
             System.out.println ("Invalid Hash Generated");
             return false;
         }
@@ -106,7 +107,7 @@ public class Blockchain {
             System.out.println("Received Blockchain Invalid");
     }
     
-    private Block generateNextBlock(String blockData) {
+    public Block generateNextBlock(String blockData) { //Making a a new value into a Block
         Block previousBlock = getLastBlock();
         int nextIndex = previousBlock.index + 1;
         Date nextTimestamp = new Date(System.currentTimeMillis());
@@ -115,6 +116,11 @@ public class Blockchain {
         addBlock(newBlock);
         //BroadcastLatest UNDONE
         return newBlock;
+    }
+    
+    public void printBlockchain(ArrayList<Block> blocks) {  //Print the blockchain (LOGS)
+        for(int i = 0; i<blocks.size(); i++)
+            System.out.println("Index: "+blocks.get(i).index+"\nHash: "+blocks.get(i).hash+"\nPrevious Hash: "+blocks.get(i).previousHash+"\nTimestamp: "+blocks.get(i).timestamp+"\nData: "+blocks.get(i).data+"\n\n");
     }
     
 }

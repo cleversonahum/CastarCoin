@@ -30,6 +30,10 @@ public class Blockchain {
         return this.blockchain.get(this.blockchain.size() - 1);
     }
     
+    public Block getLastBlock(ArrayList<Block> blocks) { //Get the last block added
+        return blocks.get(blocks.size() - 1);
+    }
+    
     private String generateHash(int index, String previousHash, Date timestamp, String data, int level, int nonce) { //Generate a Hash in accord with parameters of the block
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:SS");
         String  msgHash = Integer.toString(index) + previousHash + format.format(timestamp) + data + Integer.toString(level) + Integer.toString(nonce);
@@ -143,7 +147,7 @@ public class Blockchain {
     
     private Boolean hashMatchLevel(String hash, int level) { //Verify the hash level
         String hashBinary = toBinary(hash); //Getting a String of the binary representation
-        String requiredPrefix = '0'.repeat(level);
+        String requiredPrefix = new String(new char[level]).replace("\0", "0");
         
         return hashBinary.startsWith(requiredPrefix);
     }
@@ -186,7 +190,7 @@ public class Blockchain {
         if(timeTaken < (timeExpected/2))
             return (prevAdjustmentBlock.level+1);
         else if(timeTaken > (timeExpected*2))
-            return (prevAdjustmentBlock.difficult-1);
+            return (prevAdjustmentBlock.level-1);
         else
             return prevAdjustmentBlock.level;
     }

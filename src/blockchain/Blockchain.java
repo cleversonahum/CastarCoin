@@ -142,7 +142,7 @@ public class Blockchain {
     
     public void printBlockchain(ArrayList<Block> blocks) {  //Print the blockchain (LOGS)
         for(int i = 0; i<blocks.size(); i++)
-            System.out.println("Index: "+blocks.get(i).index+"\nHash: "+blocks.get(i).hash+"\nPrevious Hash: "+blocks.get(i).previousHash+"\nTimestamp: "+blocks.get(i).timestamp+"\nData: "+blocks.get(i).data+"\n\n");
+            System.out.println("Index: "+blocks.get(i).index+"\nHash: "+blocks.get(i).hash+"\nPrevious Hash: "+blocks.get(i).previousHash+"\nTimestamp: "+blocks.get(i).timestamp+"\nData: "+blocks.get(i).data+"\nLevel: "+blocks.get(i).level+"\nNonce: "+blocks.get(i).nonce+"\n\n");
     }
     
     private Boolean hashMatchLevel(String hash, int level) { //Verify the hash level

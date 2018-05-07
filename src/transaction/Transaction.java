@@ -8,6 +8,7 @@ public class Transaction {
     public String id;
     public ArrayList<TxIn> txIns;
     public ArrayList<TxOut> txOuts;
+    public final Integer COINBASE_AMOUNT = 50;
     
     
     private String getTransactionId(Transaction transaction) { //Generating Transaction ID
@@ -116,38 +117,73 @@ public class Transaction {
     }
 
     private Boolean validateBlockTransactions(ArrayList<Transaction> avaliateTransaction, ArrayList<UnspentTxOut> avaliateUnspentTxOut, int blockIndex) {
+        ArrayList<TxIn> txIns = null;
         Transaction coinbaseTx = avaliateTransaction.get(0);
+        
         if(!validateCoinbaseTx(coinbaseTx, blockIndex)) {
             System.out.println("Invalid Coinbase Transaction");
             return false;
         }
         
-        //CHECK FOR DUPLICATE txIns
-        for(int i = 0; i<avaliateTransaction.size();i++) {
-            //UNDONE
+        //Adding TxIn to txIns
+        for(int i = 0;i < avaliateTransaction.size();i++) {
+            for(int j = 0; j< avaliateTransaction.get(i).txIns.size(); j++) {
+                txIns.add(avaliateTransaction.get(i).txIns.get(j));
+            }
         }
-        //    //check for duplicate txIns. Each txIn can be included only once
-//    const txIns: TxIn[] = _(aTransactions)
-//        .map(tx => tx.txIns)
-//        .flatten().value();
-
         
         if(hasDuplicates(txIns))
             return false;
-    }
-    
-
-//    if (hasDuplicates(txIns)) {
-//        return false;
-//    }
-//
-//    // all but coinbase transactions
-//    const normalTransactions: Transaction[] = aTransactions.slice(1);
-//    return normalTransactions.map((tx) => validateTransaction(tx, aUnspentTxOuts))
-//        .reduce((a, b) => (a && b), true);
-//
-//};
+        
+        ArraList<Transaction> normalTransactions = avaliateTransaction.remove(0);//All transactions except the coinbaseTX
+        
+        for(int i=0; i<normalTransactions.size();i++) //Verify if the Transactions are valid
+            if(!validateTransaction(normalTransactions.get(i), avaliateUnspentTxOuts))
+                return false;
+                
+        return true; 
 
 }
 
+private Boolean hasTxInDuplicates(ArrayList<TxIn> txIns) { //Verify if there is repetead values into txIns
+    for(int i=0; i<txIns.size(); i++)
+        for(int j=0; j<txIns.size();j++)
+            if(i!=j)
+                if(txIns.get(i).txOutId.equals(txIns.get(j).txOutId) && txIns.get(i).txOutIndex == txIns.get(j).txOutIndex) {
+                    System.out.println("There is a repeated value into txIns to: "+txIns.get(i).txOutIndex);
+                    return true;   
+                }
+    return false;
+        
+}
+
+private Boolean validateCoinbaseTx(Transaction transaction, int blockIndex) {
+    if(transaction == null) {
+        System.out.println("The first transaction needs to be a coinbase");
+        return false;
+    }
+    else if (getTransactionId(transaction).equals(transaction.id)) {
+        System.out.println("Invalid coinbase TX id: "+transaction.id);
+        return false;
+    }
+    else if(transaction.txIns.size() != 1) {
+        System.out.println("one txIn needs to be specified in the coinbase");
+        return false;
+    }
+    else if(transaction.txIns.get(0).txOutIndex != blockIndex) {
+        System.out.println("The txIn signature in coinbase tx needs to be the block height");
+        return false;
+    }
+    else if(transaction.txOuts.size() != 1) {
+        System.out.println("Invalid number of txOuts in coinbase transaction");
+        return false;
+    }
+    else if(transaction.txOuts.get(0).amount != COINBASE_AMOUNT) {
+        System.out.println("Invalid coinbase amount in coinbase transaction");
+        return false;
+    }
+    else
+        return true;
+    
+}
 

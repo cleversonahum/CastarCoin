@@ -102,6 +102,8 @@ public class Transaction {
             
         return false;
         
+        //UNDONE
+        
         //const validateTxIn = (txIn: TxIn, transaction: Transaction, aUnspentTxOuts: UnspentTxOut[]): boolean => {
 //    const referencedUTxOut: UnspentTxOut =
 //        aUnspentTxOuts.find((uTxO) => uTxO.txOutId === txIn.txOutId && uTxO.txOutId === txIn.txOutId);
@@ -135,7 +137,7 @@ public class Transaction {
         if(hasDuplicates(txIns))
             return false;
         
-        ArraList<Transaction> normalTransactions = avaliateTransaction.remove(0);//All transactions except the coinbaseTX
+        ArrayList<Transaction> normalTransactions = avaliateTransaction.remove(0);//All transactions except the coinbaseTX
         
         for(int i=0; i<normalTransactions.size();i++) //Verify if the Transactions are valid
             if(!validateTransaction(normalTransactions.get(i), avaliateUnspentTxOuts))
@@ -143,122 +145,153 @@ public class Transaction {
                 
         return true; 
 
-}
+    }
 
-private Boolean hasTxInDuplicates(ArrayList<TxIn> txIns) { //Verify if there is repetead values into txIns
-    for(int i=0; i<txIns.size(); i++)
-        for(int j=0; j<txIns.size();j++)
-            if(i!=j)
-                if(txIns.get(i).txOutId.equals(txIns.get(j).txOutId) && txIns.get(i).txOutIndex == txIns.get(j).txOutIndex) {
-                    System.out.println("There is a repeated value into txIns to: "+txIns.get(i).txOutIndex);
-                    return true;   
-                }
-    return false;
+    private Boolean hasTxInDuplicates(ArrayList<TxIn> txIns) { //Verify if there is repetead values into txIns
+        for(int i=0; i<txIns.size(); i++)
+            for(int j=0; j<txIns.size();j++)
+                if(i!=j)
+                    if(txIns.get(i).txOutId.equals(txIns.get(j).txOutId) && txIns.get(i).txOutIndex == txIns.get(j).txOutIndex) {
+                        System.out.println("There is a repeated value into txIns to: "+txIns.get(i).txOutIndex);
+                        return true;   
+                    }
+        return false;
         
-}
+    }
 
-private Boolean validateCoinbaseTx(Transaction transaction, int blockIndex) {
-    if(transaction == null) {
-        System.out.println("The first transaction needs to be a coinbase");
-        return false;
-    }
-    else if (getTransactionId(transaction).equals(transaction.id)) {
-        System.out.println("Invalid coinbase TX id: "+transaction.id);
-        return false;
-    }
-    else if(transaction.txIns.size() != 1) {
-        System.out.println("one txIn needs to be specified in the coinbase");
-        return false;
-    }
-    else if(transaction.txIns.get(0).txOutIndex != blockIndex) {
-        System.out.println("The txIn signature in coinbase tx needs to be the block height");
-        return false;
-    }
-    else if(transaction.txOuts.size() != 1) {
-        System.out.println("Invalid number of txOuts in coinbase transaction");
-        return false;
-    }
-    else if(transaction.txOuts.get(0).amount != COINBASE_AMOUNT) {
-        System.out.println("Invalid coinbase amount in coinbase transaction");
-        return false;
-    }
-    else
-        return true;
+    private Boolean validateCoinbaseTx(Transaction transaction, int blockIndex) {
+        if(transaction == null) {
+            System.out.println("The first transaction needs to be a coinbase");
+            return false;
+        }
+        else if (getTransactionId(transaction).equals(transaction.id)) {
+            System.out.println("Invalid coinbase TX id: "+transaction.id);
+            return false;
+        }
+        else if(transaction.txIns.size() != 1) {
+            System.out.println("one txIn needs to be specified in the coinbase");
+            return false;
+        }
+        else if(transaction.txIns.get(0).txOutIndex != blockIndex) {
+            System.out.println("The txIn signature in coinbase tx needs to be the block height");
+            return false;
+        }
+        else if(transaction.txOuts.size() != 1) {
+            System.out.println("Invalid number of txOuts in coinbase transaction");
+            return false;
+        }
+        else if(transaction.txOuts.get(0).amount != COINBASE_AMOUNT) {
+            System.out.println("Invalid coinbase amount in coinbase transaction");
+            return false;
+        }
+        else
+            return true;
     
-}
+    }
 
-private Boolean isValidTxInStructure(TxIn txIn) {
-    if(txIn==null) {
-        System.out.println("TxIn NULL");
-        return false;
+    private Boolean isValidTxInStructure(TxIn txIn) {
+        if(txIn==null) {
+            System.out.println("TxIn NULL");
+            return false;
+        }
+        else if (!(txIn.signature instanceof String)) {
+            System.out.println("Invalid signature type in TxIn");
+            return false;
+        }
+        else if (!(txIn.txOutId instanceof String)) {
+            System.out.println("Invalid TxOutId type in TxIn");
+            return false;
+        }
+        else if (!(txIn.txOutIndex instanceof Integer)) {
+            System.out.println("Invalid TxOutIndex type in TxIn");
+            return false;
+        }
+        else
+            return true;
     }
-    else if (!(txIn.signature instanceof String)) {
-        System.out.println("Invalid signature type in TxIn");
-        return false;
-    }
-    else if (!(txIn.txOutId instanceof String)) {
-        System.out.println("Invalid TxOutId type in TxIn");
-        return false;
-    }
-    else if (!(txIn.txOutIndex instanceof Integer)) {
-        System.out.println("Invalid TxOutIndex type in TxIn");
-        return false;
-    }
-    else
-        return true;
-}
 
-private Boolean isValidTxOutStructure(TxOut txOut) {
-    if(txOut == null) {
-        System.out.println("TxOut NULL");
-        return false;
+    private Boolean isValidTxOutStructure(TxOut txOut) {
+        if(txOut == null) {
+            System.out.println("TxOut NULL");
+            return false;
+        }
+        else if (!(txOut.address instanceof String)) {
+            System.out.println("Invalid Address type in TxOut");
+            return false;
+        }
+        else if (!isValidAddress(txOut.address)) {
+            System.out.println("Invalid Txout Address");
+            return false;
+        }
+        else if(!(txOut.amount instanceof Integer)) {
+            System.out.println("Invalid Amount Type in txOut");
+            return false;
+        }
+        else
+            return true;
     }
-    else if (!(txOut.address instanceof String)) {
-        System.out.println("Invalid Address type in TxOut");
-        return false;
-    }
-    else if (!isValidAddress(txOut.address)) {
-        System.out.println("Invalid Txout Address");
-        return false;
-    }
-    else if(!(txOut.amount instanceof Integer)) {
-        System.out.printl("Invalid Amount Type in txOut");
-        return false;
-    }
-    else
-        return true;
-}
 
-private Boolean isValidAddress(String address) {
-    //TO BE DONE
-}
+    private Boolean isValidAddress(String address) {
+        //UNDONE
+    }
 
-private Boolean isValidTransactionStructure(Transaction transaction) {
-    if(!(transaction.id instanceof String)) {
-        System.out.println("Invalid transaction ID type");
-        return false;
-    }
-    else if(!(transaction.txIns instanceof ArrayList)) {
-        System.out.println("Invalid TxIns type");
-        return false;
-    }
-    else if(!(transaction.txOuts instanceof ArrayList)) {
-        System.out.println("Invalid txOuts type");
-        return false;
-    }
-    
-    for(int i=0; i<transaction.txIns.size();i++)
-        if(!isValidTxInStructure(transaction.txIns.get(i))) {
-            System.out.println("Invalid TxIn Structure to: " + transaction.txIns.get(i).txOutIndex);
+    private Boolean isValidTransactionStructure(Transaction transaction) {
+        if(!(transaction.id instanceof String)) {
+            System.out.println("Invalid transaction ID type");
+            return false;
+        }
+        else if(!(transaction.txIns instanceof ArrayList)) {
+            System.out.println("Invalid TxIns type");
+            return false;
+        }
+        else if(!(transaction.txOuts instanceof ArrayList)) {
+            System.out.println("Invalid txOuts type");
             return false;
         }
         
-    for(int i=0; i<transaction.txOuts.size();i++)
-        if(!isValidTxOutStructure(transaction.txOuts.get(i))) {
-            System.out.println("Invalid TxOut Structure to: " + transaction.txOuts.get(i).address);
-            return false;
-        }
+        for(int i=0; i<transaction.txIns.size();i++)
+            if(!isValidTxInStructure(transaction.txIns.get(i))) {
+                System.out.println("Invalid TxIn Structure to: " + transaction.txIns.get(i).txOutIndex);
+                return false;
+            }
+            
+        for(int i=0; i<transaction.txOuts.size();i++)
+            if(!isValidTxOutStructure(transaction.txOuts.get(i))) {
+                System.out.println("Invalid TxOut Structure to: " + transaction.txOuts.get(i).address);
+                return false;
+            }
+            
+        return true;
         
-    return true;
+    }
+      
+    private Transaction getCoinbaseTransaction(String address, int blockIndex) {
+        //UNDONE
+    }
+
+    private String signTxIn(Transaction transaction, int txInIndex, String privateKey, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
+        //UNDONE
+    }
+
+    private ArrayList<UnspentTxOut> updateUnspentTxOuts(ArrayList<Transaction> avaliateTransaction, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
+        //UNDONE
+    }
+    
+    private ArrayList<UnspentTxOut> processTransactions(ArrayList<Transaction> avaliateTransactions, ArrayList<UnspentTxOut> avaliateUnspentTxOuts, int blockIndex) {
+        if(!validateBlockTransactions(avaliateTransactions, avaliateUnspentTxOuts, blockIndex)) {
+            System.out.println("Invalid Block Transaction");
+            return null;
+        }
+        return updateUnspentTxOuts(avaliateTransactions, avaliateUnspentTxOuts);
+    }
+    
+    private String toHexString() {
+        //UNDONE
+        //I am not sure if it is needed
+    }
+    
+    private String getPublicKey(String avaliatePrivateKey) {
+        //UNDONE
+    }
     
 }

@@ -187,3 +187,78 @@ private Boolean validateCoinbaseTx(Transaction transaction, int blockIndex) {
     
 }
 
+private Boolean isValidTxInStructure(TxIn txIn) {
+    if(txIn==null) {
+        System.out.println("TxIn NULL");
+        return false;
+    }
+    else if (!(txIn.signature instanceof String)) {
+        System.out.println("Invalid signature type in TxIn");
+        return false;
+    }
+    else if (!(txIn.txOutId instanceof String)) {
+        System.out.println("Invalid TxOutId type in TxIn");
+        return false;
+    }
+    else if (!(txIn.txOutIndex instanceof Integer)) {
+        System.out.println("Invalid TxOutIndex type in TxIn");
+        return false;
+    }
+    else
+        return true;
+}
+
+private Boolean isValidTxOutStructure(TxOut txOut) {
+    if(txOut == null) {
+        System.out.println("TxOut NULL");
+        return false;
+    }
+    else if (!(txOut.address instanceof String)) {
+        System.out.println("Invalid Address type in TxOut");
+        return false;
+    }
+    else if (!isValidAddress(txOut.address)) {
+        System.out.println("Invalid Txout Address");
+        return false;
+    }
+    else if(!(txOut.amount instanceof Integer)) {
+        System.out.printl("Invalid Amount Type in txOut");
+        return false;
+    }
+    else
+        return true;
+}
+
+private Boolean isValidAddress(String address) {
+    //TO BE DONE
+}
+
+private Boolean isValidTransactionStructure(Transaction transaction) {
+    if(!(transaction.id instanceof String)) {
+        System.out.println("Invalid transaction ID type");
+        return false;
+    }
+    else if(!(transaction.txIns instanceof ArrayList)) {
+        System.out.println("Invalid TxIns type");
+        return false;
+    }
+    else if(!(transaction.txOuts instanceof ArrayList)) {
+        System.out.println("Invalid txOuts type");
+        return false;
+    }
+    
+    for(int i=0; i<transaction.txIns.size();i++)
+        if(!isValidTxInStructure(transaction.txIns.get(i))) {
+            System.out.println("Invalid TxIn Structure to: " + transaction.txIns.get(i).txOutIndex);
+            return false;
+        }
+        
+    for(int i=0; i<transaction.txOuts.size();i++)
+        if(!isValidTxOutStructure(transaction.txOuts.get(i))) {
+            System.out.println("Invalid TxOut Structure to: " + transaction.txOuts.get(i).address);
+            return false;
+        }
+        
+    return true;
+    
+}

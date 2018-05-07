@@ -2,7 +2,7 @@ package transaction;
 
 public class TxOut {
     public String address;
-    public int amount;
+    public Integer amount;
     
     TxOut(String address, int amount){
         this.address = address;

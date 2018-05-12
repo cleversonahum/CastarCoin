@@ -12,7 +12,7 @@ public class Transaction {
     
     
     private String getTransactionId(Transaction transaction) { //Generating Transaction ID
-        String txInContent = "", txOutContent = "", hash="";;
+        String txInContent = "", txOutContent = "", hash="";
         for(int i=0; i<transaction.txIns.size();i++) { //Getting Values from txIns and making a String
             txInContent += transaction.txIns.get(i).txOutId + transaction.txIns.get(i).txOutIndex;
         }
@@ -32,7 +32,7 @@ public class Transaction {
         return hash;
     }
     
-    private Boolean validateTransaction(Transaction transaction, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
+    public Boolean validateTransaction(Transaction transaction, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
         if(getTransactionId(transaction).equals(transaction.id)) {
             System.out.println("Invalid Transaction ID: "+transaction.id);
             return false;

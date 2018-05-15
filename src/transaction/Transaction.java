@@ -236,10 +236,10 @@ public class Transaction {
             System.out.println("Invalid Address type in TxOut");
             return false;
         }
-        else if (!isValidAddress(txOut.address)) {
-            System.out.println("Invalid Txout Address");
-            return false;
-        }
+//        else if (!isValidAddress(txOut.address)) { NOT NEEDED
+//            System.out.println("Invalid Txout Address");
+//            return false;
+//        }
         else if(!(txOut.amount instanceof Integer)) {
             System.out.println("Invalid Amount Type in txOut");
             return false;
@@ -249,7 +249,7 @@ public class Transaction {
     }
 
     private Boolean isValidAddress(String address) {
-        //UNDONE
+        //This function is not needed anymore because we are using RSA
     }
 
     private Boolean isValidTransactionStructure(Transaction transaction) {

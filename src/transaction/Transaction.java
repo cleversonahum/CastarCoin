@@ -116,23 +116,12 @@ public class Transaction {
 
         PublicKey address = referencedTxOut.address;
         
-            
-        return false;
-        
-        //UNDONE
-        
-        //const validateTxIn = (txIn: TxIn, transaction: Transaction, aUnspentTxOuts: UnspentTxOut[]): boolean => {
-//    const referencedUTxOut: UnspentTxOut =
-//        aUnspentTxOuts.find((uTxO) => uTxO.txOutId === txIn.txOutId && uTxO.txOutId === txIn.txOutId);
-//    if (referencedUTxOut == null) {
-//        console.log('referenced txOut not found: ' + JSON.stringify(txIn));
-//        return false;
-//    }
-//    const address = referencedUTxOut.address;
-//
-//    const key = ec.keyFromPublic(address, 'hex');
-//    return key.verify(transaction.id, txIn.signature);
-//};
+        //Verifying signature using public key
+        Signature publicSignature = Signature.getInstance("SHA256withRSA");
+        publicSignature.initVerify(address);
+        publicSignature.update((transaction.id).getBytes(StandardCharsets.UTF_8));
+        byte[] signatureBytes = Base64.getDecoder().decode(txIn.signature);
+        return publicSignature.verify(signatureBytes);            
     }
 
     private Boolean validateBlockTransactions(ArrayList<Transaction> avaliateTransaction, ArrayList<UnspentTxOut> avaliateUnspentTxOut, int blockIndex) {
@@ -321,6 +310,7 @@ public class Transaction {
 
     private ArrayList<UnspentTxOut> updateUnspentTxOuts(ArrayList<Transaction> avaliateTransaction, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
         //UNDONE
+        
     }
     
     private ArrayList<UnspentTxOut> processTransactions(ArrayList<Transaction> avaliateTransactions, ArrayList<UnspentTxOut> avaliateUnspentTxOuts, int blockIndex) {

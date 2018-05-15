@@ -248,9 +248,9 @@ public class Transaction {
             return true;
     }
 
-    private Boolean isValidAddress(String address) {
-        //This function is not needed anymore because we are using RSA
-    }
+//    private Boolean isValidAddress(String address) {
+//        //This function is not needed anymore because we are using RSA
+//    }
 
     private Boolean isValidTransactionStructure(Transaction transaction) {
         if(!(transaction.id instanceof String)) {

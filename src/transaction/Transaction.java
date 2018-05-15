@@ -283,7 +283,6 @@ public class Transaction {
     }
       
     private Transaction getCoinbaseTransaction(PublicKey address, int blockIndex) {
-        //UNDONE
         Transaction transaction = new Transaction();
         TxIn txIn = new TxIn();
         txIn.signature = "";

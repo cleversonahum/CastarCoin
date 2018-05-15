@@ -287,7 +287,6 @@ public class Transaction {
     }
 
     private String signTxIn(Transaction transaction, int txInIndex, PrivateKey privateKey, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
-        //UNDONE
         TxIn txIn = transaction.txIns.get(txInIndex);
         String dataToSign = transaction.id;
         UnspentTxOut referencedUnspentTxOut = findUnspentTxOut(txIn.txOutId, txIn.txOutIndex, avaliateUnspentTxOuts);

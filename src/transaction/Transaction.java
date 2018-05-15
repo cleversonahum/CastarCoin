@@ -114,7 +114,7 @@ public class Transaction {
             return false;  
         }
 
-        String address = referencedTxOut.address;
+        PublicKey address = referencedTxOut.address;
         
             
         return false;
@@ -232,7 +232,7 @@ public class Transaction {
             System.out.println("TxOut NULL");
             return false;
         }
-        else if (!(txOut.address instanceof String)) {
+        else if (!(txOut.address instanceof PublicKey)) {
             System.out.println("Invalid Address type in TxOut");
             return false;
         }
@@ -282,8 +282,20 @@ public class Transaction {
         
     }
       
-    private Transaction getCoinbaseTransaction(String address, int blockIndex) {
+    private Transaction getCoinbaseTransaction(PublicKey address, int blockIndex) {
         //UNDONE
+        Transaction transaction = new Transaction();
+        TxIn txIn = new TxIn();
+        txIn.signature = "";
+        txIn.txOutId = "";
+        txIn.txOutIndex = blockIndex;
+        
+        transaction.txIns.add(txIn);
+        transaction.txOuts = new ArrayList<TxOut>();
+        transaction.txOuts.add(new TxOut(address, COINBASE_AMOUNT));
+        transaction.id = getTransactionId(transaction);
+        
+        return transaction;
     }
 
     private String signTxIn(Transaction transaction, int txInIndex, PrivateKey privateKey, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {

@@ -36,11 +36,40 @@ public class Wallet {
 		
 	}
 	
+	private ArrayList<TxOut> createTxOuts(String receiverAddress, String myAddress, int amount, int leftOverAmount) {
+		
+		TxOut txOut1 = new TxOut(receiverAddress, amount);
+		ArrayList<TxOut> txOut = new ArrayList<TxOut>();
+		if(leftOverAmount == 0) {
+			txOut.add(txOut1);
+			return txOut;
+		} else {
+			TxOut leftOverTx = new TxOut(myAddress, leftOverAmount);
+			txOut.add(txOut1);
+			txOut.add(leftOverTx);
+			return txOut;
+		}
+	}
+
 	private ArrayList<UnspentTxOut> filterTxPoolTxs(ArrayList<UnspentTxOut> myUnspentTxOutsA, ArrayList<Transaction> txPool) {
 		
-		ArrayList<TxIn> txIns = 
+		//ArrayList<TxIn> txIns = COMPLETAR
 		
-		
+		ArrayList<UnspentTxOut> removable = new ArrayList<UnspentTxOut>();
+	
+		for(UnspentTxOut value : myUnspentTxOutsA) {
+			
+			//TcIn txIn = COMPLETAR
+			
+			if(txIn == null) {
+				
+			}else {
+				
+				removable.add(value);
+			}
+			
+		}
+				
 		return null;
 	}
 
@@ -74,8 +103,7 @@ public class Wallet {
 			}
 			
 		}
-		
-		return null;
+		return 0;
 	}
 
 

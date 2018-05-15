@@ -2,7 +2,24 @@ package transaction;
 
 import java.util.ArrayList;
 import java.util.Base64;
+
 import java.security.MessageDigest;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.KeyFactory;
+import java.security.Signature;
+import java.security.spec.RSAPrivateKeySpec;
+import java.security.spec.RSAPublicKeySpec;
+
+import javax.crypto.Cipher;
+
+import java.math.BigInteger;
+
+import java.nio.charset.StandardCharsets;
 
 public class Transaction {
     public String id;
@@ -290,8 +307,10 @@ public class Transaction {
         //I am not sure if it is needed
     }
     
-    private String getPublicKey(String avaliatePrivateKey) {
-        //UNDONE
+    private PublicKey getPublicKey(PrivateKey avaliatePrivateKey) { //Making a public key from private
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        RSAPrivateKeySpec priv = kf.getKeySpec(avaliatePrivateKey, RSAPrivateKeySpec.class);
+        RSAPublicKeySpec keySpec = new RSAPublicKeySpec(priv.getModulus(), BigInteger.valueOf(65537));
+        return kf.generatePublic(keySpec);
     }
-    
 }

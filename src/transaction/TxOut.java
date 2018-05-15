@@ -1,10 +1,12 @@
 package transaction;
 
+import java.security.PublicKey;
+
 public class TxOut {
-    public String address;
+    public PublicKey address;
     public Integer amount;
     
-    TxOut(String address, int amount){
+    TxOut(PublicKey address, int amount){
         this.address = address;
         this.amount = amount;
     }

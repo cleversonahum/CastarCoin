@@ -286,8 +286,27 @@ public class Transaction {
         //UNDONE
     }
 
-    private String signTxIn(Transaction transaction, int txInIndex, String privateKey, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
+    private String signTxIn(Transaction transaction, int txInIndex, PrivateKey privateKey, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
         //UNDONE
+        TxIn txIn = transaction.txIns.get(txInIndex);
+        String dataToSign = transaction.id;
+        UnspentTxOut referencedUnspentTxOut = findUnspentTxOut(txIn.txOutId, txIn.txOutIndex, avaliateUnspentTxOuts);
+        if(referencedUnspentTxOut == null) {
+            System.out.println("TxOut reference not found");
+            throw new java.lang.RuntimeException("TxOut reference not found");
+        }
+        PublicKey referencedAddress = referencedUnspentTxOut.address;
+        
+        if(!getPublicKey(privateKey).equals(referencedAddress)) {
+            System.out.println("Key does not match the address referenced in TxIn");
+            throw new java.lang.RuntimeException("Key does not match the address referenced in TxIn");
+        }
+        
+        Signature privateSignature = Signature.getInstance("SHA256withRSA");
+        privateSignature.initSign(privateKey);
+        privateSignature.update(dataToSign.getBytes(StandardCharsets.UTF_8));
+        byte[] signature = privateSignature.sign();
+        return Base64.getEncoder().encodeToString(signature);
     }
 
     private ArrayList<UnspentTxOut> updateUnspentTxOuts(ArrayList<Transaction> avaliateTransaction, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {

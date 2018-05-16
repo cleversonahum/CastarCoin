@@ -35,7 +35,7 @@ public class Transaction {
         }
         
         for(int i=0; i<transaction.txOuts.size();i++) { //Getting Values from txOuts and making a String
-            txOutContent += transaction.txOuts.get(i).address + transaction.txOuts.get(i).amount;
+            txOutContent += getStringFromPublicKey(transaction.txOuts.get(i).address) + transaction.txOuts.get(i).amount;
         }
         
         try {
@@ -124,7 +124,7 @@ public class Transaction {
         return publicSignature.verify(signatureBytes);            
     }
 
-    private Boolean validateBlockTransactions(ArrayList<Transaction> avaliateTransaction, ArrayList<UnspentTxOut> avaliateUnspentTxOut, int blockIndex) {
+    private Boolean validateBlockTransactions(ArrayList<Transaction> avaliateTransaction, ArrayList<UnspentTxOut> avaliateUnspentTxOuts, int blockIndex) {
         ArrayList<TxIn> txIns = null;
         Transaction coinbaseTx = avaliateTransaction.get(0);
         
@@ -140,10 +140,11 @@ public class Transaction {
             }
         }
         
-        if(hasDuplicates(txIns))
+        if(hasTxInDuplicates(txIns))
             return false;
         
-        ArrayList<Transaction> normalTransactions = avaliateTransaction.remove(0);//All transactions except the coinbaseTX
+        avaliateTransaction.remove(0); //Removing first transaction
+        ArrayList<Transaction> normalTransactions = avaliateTransaction;//All transactions except the coinbaseTX
         
         for(int i=0; i<normalTransactions.size();i++) //Verify if the Transactions are valid
             if(!validateTransaction(normalTransactions.get(i), avaliateUnspentTxOuts))
@@ -331,5 +332,10 @@ public class Transaction {
         RSAPrivateKeySpec priv = kf.getKeySpec(avaliatePrivateKey, RSAPrivateKeySpec.class);
         RSAPublicKeySpec keySpec = new RSAPublicKeySpec(priv.getModulus(), BigInteger.valueOf(65537));
         return kf.generatePublic(keySpec);
+    }
+    
+    private String getStringFromPublicKey(PublicKey publicKey) {
+        byte[] encodedPublicKey = publicKey.getEncoded();
+        return Base64.getEncoder().encodeToString(encodedPublicKey);
     }
 }

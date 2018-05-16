@@ -92,7 +92,7 @@ public class Transaction {
             if(avaliateUnspentTxOuts.get(i).txOutId.equals(transactionId) && avaliateUnspentTxOuts.get(i).txOutIndex == index)
                 return avaliateUnspentTxOuts.get(i);
         System.out.println("findUnspentTxOut() find nothing");
-        return avaliateUnspentTxOuts.get(-1);
+        return null;
     }
 
     private int totalTxOutValues(Transaction transaction) {
@@ -309,9 +309,22 @@ public class Transaction {
         return Base64.getEncoder().encodeToString(signature);
     }
 
-    private ArrayList<UnspentTxOut> updateUnspentTxOuts(ArrayList<Transaction> avaliateTransaction, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
+    private ArrayList<UnspentTxOut> updateUnspentTxOuts(ArrayList<Transaction> avaliateTransactions, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
         //UNDONE
-        
+        ArrayList<UnspentTxOut> newUnspentTxOuts;
+        for(int i=0; i<avaliateTransactions.size();i++)
+            for(int j=0; j<avaliateTransactions.get(i).txOuts.size(); j++)
+                newUnspentTxOuts.add(new UnspentTxOut(avaliateTransactions.get(i).id, i, avaliateTransactions.get(i).txOuts.get(j).address, avaliateTransactions.get(i).txOuts.get(j).amount));
+                
+        ArrayList<UnspentTxOut> consumedTxOuts;
+        for(int i=0; i<avaliateTransactions.size();i++)
+            for(int j=0; j<avaliateTransactions.get(i).txIns.size();j++)
+                consumedTxOuts.add(new UnspentTxOut(avaliateTransactions.get(i).txIns.get(j).txOutId, avaliateTransactions.get(i).txIns.get(j).txOutIndex, null, 0));
+                
+        ArrayList<UnspentTxOut> resultingUnspentTxOuts = new ArrayList<UnspentTxOut>(newUnspentTxOuts);
+        for(int i=0; i<avaliateUnspentTxOuts.size();i++)
+            if(findUnspentTxOut(avaliateUnspentTxOuts.get(i).txOutId, avaliateUnspentTxOuts.get(i).txOutIndex, consumedTxOuts)!=null)
+                resultingUnspentTxOuts.add(avaliateUnspentTxOuts.get(i));
     }
     
     private ArrayList<UnspentTxOut> processTransactions(ArrayList<Transaction> avaliateTransactions, ArrayList<UnspentTxOut> avaliateUnspentTxOuts, int blockIndex) {

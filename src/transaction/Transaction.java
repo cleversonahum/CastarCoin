@@ -21,6 +21,12 @@ public class Transaction {
     public ArrayList<TxOut> txOuts;
     public final Integer COINBASE_AMOUNT = 50;
     
+    public Transaction(String id, ArrayList<TxIn> txIns, ArrayList<TxOut> txOuts) {
+        this.id = id;
+        this.txIns = txIns;
+        this.txOuts = txOuts;
+    }
+    
     
     private String getTransactionId(Transaction transaction) { //Generating Transaction ID
         String txInContent = "", txOutContent = "", hash="";

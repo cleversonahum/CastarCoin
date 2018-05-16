@@ -99,6 +99,8 @@ public class Transaction {
 
     private Boolean validateTxIn(TxIn txIn, Transaction transaction, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
         UnspentTxOut referencedTxOut = null;
+        Boolean result = false;
+        
         for(int i=0; i<avaliateUnspentTxOuts.size();i++)
             if(avaliateUnspentTxOuts.get(i).txOutId.equals(txIn.txOutId) && avaliateUnspentTxOuts.get(i).txOutId == txIn.txOutId) 
                 referencedTxOut = avaliateUnspentTxOuts.get(i);
@@ -110,16 +112,22 @@ public class Transaction {
 
         PublicKey address = referencedTxOut.address;
         
-        //Verifying signature using public key
-        Signature publicSignature = Signature.getInstance("SHA256withRSA");
-        publicSignature.initVerify(address);
-        publicSignature.update((transaction.id).getBytes(StandardCharsets.UTF_8));
-        byte[] signatureBytes = Base64.getDecoder().decode(txIn.signature);
-        return publicSignature.verify(signatureBytes);            
+        try {
+            //Verifying signature using public key
+            Signature publicSignature = Signature.getInstance("SHA256withRSA");
+            publicSignature.initVerify(address);
+            publicSignature.update((transaction.id).getBytes(StandardCharsets.UTF_8));
+            byte[] signatureBytes = Base64.getDecoder().decode(txIn.signature);
+            result = publicSignature.verify(signatureBytes);
+        }
+        catch(Exception e){e.printStackTrace();}
+        
+        return result;
+
     }
 
     private Boolean validateBlockTransactions(ArrayList<Transaction> avaliateTransaction, ArrayList<UnspentTxOut> avaliateUnspentTxOuts, int blockIndex) {
-        ArrayList<TxIn> txIns = null;
+        ArrayList<TxIn> txIns = new ArrayList<TxIn>();
         Transaction coinbaseTx = avaliateTransaction.get(0);
         
         if(!validateCoinbaseTx(coinbaseTx, blockIndex)) {
@@ -282,6 +290,7 @@ public class Transaction {
     }
 
     private String signTxIn(Transaction transaction, int txInIndex, PrivateKey privateKey, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
+        String result = "";
         TxIn txIn = transaction.txIns.get(txInIndex);
         String dataToSign = transaction.id;
         UnspentTxOut referencedUnspentTxOut = findUnspentTxOut(txIn.txOutId, txIn.txOutIndex, avaliateUnspentTxOuts);
@@ -296,21 +305,26 @@ public class Transaction {
             throw new java.lang.RuntimeException("Key does not match the address referenced in TxIn");
         }
         
-        Signature privateSignature = Signature.getInstance("SHA256withRSA");
-        privateSignature.initSign(privateKey);
-        privateSignature.update(dataToSign.getBytes(StandardCharsets.UTF_8));
-        byte[] signature = privateSignature.sign();
-        return Base64.getEncoder().encodeToString(signature);
+        try {
+            Signature privateSignature = Signature.getInstance("SHA256withRSA");
+            privateSignature.initSign(privateKey);
+            privateSignature.update(dataToSign.getBytes(StandardCharsets.UTF_8));
+            byte[] signature = privateSignature.sign();
+            result = Base64.getEncoder().encodeToString(signature);
+        }
+        catch(Exception e){e.printStackTrace();}
+
+        return result;
     }
 
     private ArrayList<UnspentTxOut> updateUnspentTxOuts(ArrayList<Transaction> avaliateTransactions, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
         //UNDONE
-        ArrayList<UnspentTxOut> newUnspentTxOuts;
+        ArrayList<UnspentTxOut> newUnspentTxOuts = new ArrayList<UnspentTxOut>();
         for(int i=0; i<avaliateTransactions.size();i++)
             for(int j=0; j<avaliateTransactions.get(i).txOuts.size(); j++)
                 newUnspentTxOuts.add(new UnspentTxOut(avaliateTransactions.get(i).id, i, avaliateTransactions.get(i).txOuts.get(j).address, avaliateTransactions.get(i).txOuts.get(j).amount));
                 
-        ArrayList<UnspentTxOut> consumedTxOuts;
+        ArrayList<UnspentTxOut> consumedTxOuts = new ArrayList<UnspentTxOut>();
         for(int i=0; i<avaliateTransactions.size();i++)
             for(int j=0; j<avaliateTransactions.get(i).txIns.size();j++)
                 consumedTxOuts.add(new UnspentTxOut(avaliateTransactions.get(i).txIns.get(j).txOutId, avaliateTransactions.get(i).txIns.get(j).txOutIndex, null, 0));
@@ -319,6 +333,8 @@ public class Transaction {
         for(int i=0; i<avaliateUnspentTxOuts.size();i++)
             if(findUnspentTxOut(avaliateUnspentTxOuts.get(i).txOutId, avaliateUnspentTxOuts.get(i).txOutIndex, consumedTxOuts)!=null)
                 resultingUnspentTxOuts.add(avaliateUnspentTxOuts.get(i));
+                
+        return resultingUnspentTxOuts;
     }
     
     private ArrayList<UnspentTxOut> processTransactions(ArrayList<Transaction> avaliateTransactions, ArrayList<UnspentTxOut> avaliateUnspentTxOuts, int blockIndex) {
@@ -330,10 +346,17 @@ public class Transaction {
     }
     
     private PublicKey getPublicKey(PrivateKey avaliatePrivateKey) { //Making a public key from private
-        KeyFactory kf = KeyFactory.getInstance("RSA");
-        RSAPrivateKeySpec priv = kf.getKeySpec(avaliatePrivateKey, RSAPrivateKeySpec.class);
-        RSAPublicKeySpec keySpec = new RSAPublicKeySpec(priv.getModulus(), BigInteger.valueOf(65537));
-        return kf.generatePublic(keySpec);
+        PublicKey result = null;
+        
+        try {
+            KeyFactory kf = KeyFactory.getInstance("RSA");
+            RSAPrivateKeySpec priv = kf.getKeySpec(avaliatePrivateKey, RSAPrivateKeySpec.class);
+            RSAPublicKeySpec keySpec = new RSAPublicKeySpec(priv.getModulus(), BigInteger.valueOf(65537));
+            result = kf.generatePublic(keySpec);
+        }
+        catch(Exception e){e.printStackTrace();}
+        
+        return result;
     }
     
     private String getStringFromPublicKey(PublicKey publicKey) {

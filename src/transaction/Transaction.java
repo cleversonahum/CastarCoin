@@ -281,7 +281,7 @@ public class Transaction {
     }
       
     private Transaction getCoinbaseTransaction(PublicKey address, int blockIndex) {
-        Transaction transaction = new Transaction();
+        Transaction transaction = new Transaction(null,null,null);
         TxIn txIn = new TxIn();
         txIn.signature = "";
         txIn.txOutId = "";

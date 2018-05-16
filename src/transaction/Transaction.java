@@ -329,11 +329,6 @@ public class Transaction {
         return updateUnspentTxOuts(avaliateTransactions, avaliateUnspentTxOuts);
     }
     
-    private String toHexString() {
-        //UNDONE
-        //I am not sure if it is needed
-    }
-    
     private PublicKey getPublicKey(PrivateKey avaliatePrivateKey) { //Making a public key from private
         KeyFactory kf = KeyFactory.getInstance("RSA");
         RSAPrivateKeySpec priv = kf.getKeySpec(avaliatePrivateKey, RSAPrivateKeySpec.class);

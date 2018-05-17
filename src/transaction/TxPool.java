@@ -10,7 +10,7 @@ public class TxPool {
         return this.txPool;
     }
 
-    public void addToTransactionPool(Transaction tx, ArrayList<UnspentTxOut> unspentTxOuts) {
+    public static void addToTransactionPool(Transaction tx, ArrayList<UnspentTxOut> unspentTxOuts) {
 
         if (!tx.validateTransaction(tx, unspentTxOuts)) {
             try {

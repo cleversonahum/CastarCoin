@@ -239,7 +239,7 @@ public class Transaction {
             return true;
     }
 
-    private Boolean isValidAddress(PublicKey address) {
+    public static Boolean isValidAddress(PublicKey address) {
         if(!(address instanceof PublicKey))
             return false;
         return true;
@@ -360,7 +360,7 @@ public class Transaction {
         return result;
     }
     
-    private static String getStringFromPublicKey(PublicKey publicKey) {
+    public static String getStringFromPublicKey(PublicKey publicKey) {
         byte[] encodedPublicKey = publicKey.getEncoded();
         return Base64.getEncoder().encodeToString(encodedPublicKey);
     }

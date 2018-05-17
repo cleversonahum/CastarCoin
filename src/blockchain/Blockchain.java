@@ -71,7 +71,7 @@ public class Blockchain {
         return blocks.get(blocks.size() - 1);
     }
     
-    private String generateHash(int index, String previousHash, Date timestamp, String data, int level, int nonce) { //Generate a Hash in accord with parameters of the block
+    private String generateHash(int index, String previousHash, Date timestamp, ArrayList<Transaction> data, int level, int nonce) { //Generate a Hash in accord with parameters of the block
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:SS");
         String  msgHash = Integer.toString(index) + previousHash + format.format(timestamp) + data + Integer.toString(level) + Integer.toString(nonce);
         String hash="";
@@ -85,12 +85,17 @@ public class Blockchain {
         return hash;
     }
     
+        
+//    const calculateHash = (index: number, previousHash: string, timestamp: number, data: Transaction[],
+//                       difficulty: number, nonce: number): string =>
+//    CryptoJS.SHA256(index + previousHash + timestamp + data + difficulty + nonce).toString();
+    
     private String generateHashBlock(Block block) { //Generate Hash to a Block made
         return generateHash(block.index, block.previousHash, block.timestamp, block.data, block.level, block.nonce);
     }
     
     private Boolean isValidBlockStructure(Block newBlock) { //Verify if Block Variables are in accord with Block Structure
-        return ((newBlock.index instanceof Integer) && (newBlock.hash instanceof String) && (newBlock.previousHash instanceof String) && (newBlock.timestamp instanceof Date) && (newBlock.data instanceof String) && (newBlock.level instanceof Integer) && (newBlock.nonce instanceof Integer));    
+        return ((newBlock.index instanceof Integer) && (newBlock.hash instanceof String) && (newBlock.previousHash instanceof String) && (newBlock.timestamp instanceof Date) && (newBlock.data instanceof ArrayList) && (newBlock.level instanceof Integer) && (newBlock.nonce instanceof Integer));    
     }
     
     private Boolean isValidNewBlock (Block newBlock, Block previousBlock) { //Verify if the new block to be added is Valid
@@ -127,26 +132,47 @@ public class Blockchain {
         return ((this.genesisBlock.index == validateBlock.index) &&                         (this.genesisBlock.hash.equals(validateBlock.hash)) && (this.genesisBlock.previousHash.equals(validateBlock.previousHash)) && (this.genesisBlock.timestamp.equals(validateBlock.timestamp)) && (this.genesisBlock.data.equals(validateBlock.data)));
     }
     
-    private Boolean isValidChain(ArrayList<Block> validateBlockchain) {
+    private ArrayList<UnspentTxOut> isValidChain(ArrayList<Block> validateBlockchain) {
         if(!isValidGenesisBlock(validateBlockchain.get(0))) { //Verify if Genesis Block is correct
             System.out.println("Invalid Genesis Block");
-            return false;
-        }
-        for(int i=1; i < validateBlockchain.size(); i++) { //Verify other blocks
-            if(!isValidNewBlock(validateBlockchain.get(i), validateBlockchain.get(i-1)))
-                return false;
+            return null;
         }
         
-        return true;    
+        ArrayList<UnspentTxOut> avaliateUnspentTxOuts = new ArrayList<UnspentTxOut>();
+        
+        for(int i=1; i < validateBlockchain.size(); i++) { //Verify other blocks
+            Block currentBlock = validateBlockchain.get(i);
+            
+            if(!isValidNewBlock(validateBlockchain.get(i), validateBlockchain.get(i-1)))
+                return null;
+                
+            avaliateUnspentTxOuts = Transaction.processTransactions(currentBlock.data, avaliateUnspentTxOuts, currentBlock.index);
+            if(avaliateUnspentTxOuts==null) {
+                System.out.println("Invalid Transaction in Blockchain");
+                return null;
+            }
+        }
+        
+        return avaliateUnspentTxOuts;    
     }
     
     private Boolean addBlockToChain(Block newBlock) {
         if(isValidNewBlock(newBlock, getLastBlock())) {
-            this.blockchain.add(newBlock);
-            return true;
+            ArrayList<UnspentTxOut> retVal = Transaction.processTransactions(newBlock.data, getUnspentTxOuts(), newBlock.index);
+            if(retVal == null) {
+                System.out.println("Block is not valid in transaction");
+                return false;
+            }
+            else {
+                this.blockchain.add(newBlock);
+                setUnspentTxOuts(retVal);
+                TxPool.updateTransactionPool(unspentTxOuts);
+                return true;
+            }
         }
         return false;
     }
+
     
     private int getAccumulatedLevel(ArrayList<Block> receivedBlockchain) {
         int sum = 0;
@@ -157,25 +183,19 @@ public class Blockchain {
     }
     
     private void replaceChain(ArrayList<Block> newBlocks) {
-        if(isValidChain(newBlocks) && (getAccumulatedLevel(newBlocks) > getAccumulatedLevel(getBlockchain()))) {
+        ArrayList<UnspentTxOut> avaliateUnspentTxOuts = isValidChain(newBlocks);
+        Boolean validChain = (avaliateUnspentTxOuts != null);
+        
+        if(validChain && (getAccumulatedLevel(newBlocks) > getAccumulatedLevel(getBlockchain()))) {
             System.out.println("Blockchain received is valid, the current blockchain was replaced by the received blockchain");
             this.blockchain = newBlocks;
+            setUnspentTxOuts(avaliateUnspentTxOuts);
+            TxPool.updateTransactionPool(unspentTxOuts);
             //FUNCTION TO BROADCAST THIS, UNDONE
         }
         else
             System.out.println("Received Blockchain Invalid");
     }
-    
-//    public Block generateNextBlock(String blockData) { //Making a a new value into a Block
-//        Block previousBlock = getLastBlock();
-//        int nextIndex = previousBlock.index + 1;
-//        int level = getLevel(getBlockchain());
-//        Date nextTimestamp = new Date(System.currentTimeMillis());
-//        Block newBlock = findBlock(nextIndex, previousBlock.hash, nextTimestamp, blockData, level);
-//        addBlock(newBlock);
-//        //BroadcastLatest UNDONE
-//        return newBlock;
-//    } OLD FUNCTION
 
     private Block generateNextBlock() {
         Transaction coinbaseTx = Transaction.getCoinbaseTransaction(Wallet.getPublicFromWallet(), getLastBlock().index+1);
@@ -187,6 +207,25 @@ public class Blockchain {
         //UNDONE
     }
     
+    private Block generateNextBlockTransaction(PublicKey receiverAddress, Integer amount) {
+        if(!Transaction.isValidAddress(receiverAddress)) {
+            System.out.println("Invalid Address");
+            throw new java.lang.RuntimeException("Invalid Address");
+        }
+        else if(amount instanceof Integer) {
+            System.out.println("Invalid Amount");
+            throw new java.lang.RuntimeException("Invalid Amount");
+        }
+        
+        Transaction coinbaseTx = Transaction.getCoinbaseTransaction(Wallet.getPublicFromWallet(), getLastBlock().index+1);
+        Transaction tx = Wallet.createTransaction(receiverAddress, amount, Wallet.getPrivateFromWallet(), getUnspentTxOuts(), TxPool.getTransactionPool());
+        ArrayList<Transaction> blockData = new ArrayList<Transaction>();
+        blockData.add(coinbaseTx);
+        blockData.add(tx);
+        return generateRawNextBlock(blockData);
+        //UNDONE
+    }
+
     public void printBlockchain(ArrayList<Block> blocks) {  //Print the blockchain (LOGS)
         for(int i = 0; i<blocks.size(); i++)
             System.out.println("Index: "+blocks.get(i).index+"\nHash: "+blocks.get(i).hash+"\nPrevious Hash: "+blocks.get(i).previousHash+"\nTimestamp: "+blocks.get(i).timestamp+"\nData: "+blocks.get(i).data+"\nLevel: "+blocks.get(i).level+"\nNonce: "+blocks.get(i).nonce+"\n\n");
@@ -211,7 +250,7 @@ public class Blockchain {
         return sb.toString();
     }
     
-    private Block findBlock(int index, String previousHash, Date timestamp, String data, int level) {
+    private Block findBlock(int index, String previousHash, Date timestamp, ArrayList<Transaction> data, int level) {
         int nonce = 0;
         while(true) {
             String hash = generateHash(index, previousHash, timestamp, data, level, nonce);
@@ -279,7 +318,22 @@ public class Blockchain {
     
     private SOMETHING getMyUnspentTransactionOutputs() {
         return Wallet.findUnspentTxOuts(Wallet.getPublicFromWallet(), getUnspentTxOuts());
-        //UNDONE
+    }
+    
+    private int getAccountBalance () {
+        return Wallet.getBalance(Wallet.getPublicFromWallet(), getUnspentTxOuts());
+    }
+    
+    private Transaction sendTransaction(PublicKey address, int amount) {
+        Transaction tx = Wallet.createTransaction(address, amount, Wallet.getPrivateFromWallet(), getUnspentTxOuts(), TxPool.getTransactionPool());
+        TxPool.addToTransactionPool(tx, getUnspentTxOuts());
+        //BROADCAST UNDONE
+        
+        return tx;
+    }
+    
+    private void handleReceivedTransaction(Transaction transaction) {
+        TxPool.addToTransactionPool(transaction, getUnspentTxOuts());
     }
 
 }

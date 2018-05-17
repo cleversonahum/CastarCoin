@@ -19,9 +19,9 @@ public class Transaction {
     public String id;
     public ArrayList<TxIn> txIns;
     public ArrayList<TxOut> txOuts;
-    public final Integer COINBASE_AMOUNT = 50;
+    public static final Integer COINBASE_AMOUNT = 50;
     
-    private String getTransactionId(Transaction transaction) { //Generating Transaction ID
+    private static String getTransactionId(Transaction transaction) { //Generating Transaction ID
         String txInContent = "", txOutContent = "", hash="";
         for(int i=0; i<transaction.txIns.size();i++) { //Getting Values from txIns and making a String
             txInContent += transaction.txIns.get(i).txOutId + transaction.txIns.get(i).txOutIndex;
@@ -42,7 +42,7 @@ public class Transaction {
         return hash;
     }
     
-    public Boolean validateTransaction(Transaction transaction, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
+    public static Boolean validateTransaction(Transaction transaction, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
         if(getTransactionId(transaction).equals(transaction.id)) {
             System.out.println("Invalid Transaction ID: "+transaction.id);
             return false;
@@ -60,7 +60,7 @@ public class Transaction {
         
     }
     
-    private Boolean hasValidTxIns(Transaction transaction, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
+    private static Boolean hasValidTxIns(Transaction transaction, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
         Boolean result = true;
         for(int i=0; i<transaction.txIns.size(); i++) {
             result = result && validateTxIn(transaction.txIns.get(i), transaction, avaliateUnspentTxOuts);
@@ -68,7 +68,7 @@ public class Transaction {
         return result;
     }
     
-    private int totalTxInValues (Transaction transaction, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
+    private static int totalTxInValues (Transaction transaction, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
         int result = 0;
         for(int i=0; i<transaction.txIns.size();i++)
             result += getTxInAmount(transaction.txIns.get(i), avaliateUnspentTxOuts);
@@ -76,11 +76,11 @@ public class Transaction {
         return result;
     }
     
-    private int getTxInAmount(TxIn txIn, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
+    private static int getTxInAmount(TxIn txIn, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
         return findUnspentTxOut(txIn.txOutId, txIn.txOutIndex, avaliateUnspentTxOuts).amount;
     }
 
-    private UnspentTxOut findUnspentTxOut(String transactionId, int index, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
+    private static UnspentTxOut findUnspentTxOut(String transactionId, int index, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
         for(int i=0; i<avaliateUnspentTxOuts.size();i++)
             if(avaliateUnspentTxOuts.get(i).txOutId.equals(transactionId) && avaliateUnspentTxOuts.get(i).txOutIndex == index)
                 return avaliateUnspentTxOuts.get(i);
@@ -88,7 +88,7 @@ public class Transaction {
         return null;
     }
 
-    private int totalTxOutValues(Transaction transaction) {
+    private static int totalTxOutValues(Transaction transaction) {
         int result = 0;
         for(int i=0; i<transaction.txOuts.size();i++)
             result += transaction.txOuts.get(i).amount;
@@ -96,7 +96,7 @@ public class Transaction {
         return result;
     }
 
-    private Boolean validateTxIn(TxIn txIn, Transaction transaction, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
+    private static Boolean validateTxIn(TxIn txIn, Transaction transaction, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
         UnspentTxOut referencedTxOut = null;
         Boolean result = false;
         
@@ -125,7 +125,7 @@ public class Transaction {
 
     }
 
-    private Boolean validateBlockTransactions(ArrayList<Transaction> avaliateTransaction, ArrayList<UnspentTxOut> avaliateUnspentTxOuts, int blockIndex) {
+    private static Boolean validateBlockTransactions(ArrayList<Transaction> avaliateTransaction, ArrayList<UnspentTxOut> avaliateUnspentTxOuts, int blockIndex) {
         ArrayList<TxIn> txIns = new ArrayList<TxIn>();
         Transaction coinbaseTx = avaliateTransaction.get(0);
         
@@ -155,7 +155,7 @@ public class Transaction {
 
     }
 
-    private Boolean hasTxInDuplicates(ArrayList<TxIn> txIns) { //Verify if there is repetead values into txIns
+    private static Boolean hasTxInDuplicates(ArrayList<TxIn> txIns) { //Verify if there is repetead values into txIns
         for(int i=0; i<txIns.size(); i++)
             for(int j=0; j<txIns.size();j++)
                 if(i!=j)
@@ -167,7 +167,7 @@ public class Transaction {
         
     }
 
-    private Boolean validateCoinbaseTx(Transaction transaction, int blockIndex) {
+    private static Boolean validateCoinbaseTx(Transaction transaction, int blockIndex) {
         if(transaction == null) {
             System.out.println("The first transaction needs to be a coinbase");
             return false;
@@ -227,10 +227,10 @@ public class Transaction {
             System.out.println("Invalid Address type in TxOut");
             return false;
         }
-//        else if (!isValidAddress(txOut.address)) { NOT NEEDED
-//            System.out.println("Invalid Txout Address");
-//            return false;
-//        }
+        else if (!isValidAddress(txOut.address)) {
+            System.out.println("Invalid Txout Address");
+            return false;
+        }
         else if(!(txOut.amount instanceof Integer)) {
             System.out.println("Invalid Amount Type in txOut");
             return false;
@@ -239,9 +239,11 @@ public class Transaction {
             return true;
     }
 
-//    private Boolean isValidAddress(String address) {
-//        //This function is not needed anymore because we are using RSA
-//    }
+    private Boolean isValidAddress(PublicKey address) {
+        if(!(address instanceof PublicKey))
+            return false;
+        return true;
+    }
 
     private Boolean isValidTransactionStructure(Transaction transaction) {
         if(!(transaction.id instanceof String)) {
@@ -316,7 +318,7 @@ public class Transaction {
         return result;
     }
 
-    private ArrayList<UnspentTxOut> updateUnspentTxOuts(ArrayList<Transaction> avaliateTransactions, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
+    private static ArrayList<UnspentTxOut> updateUnspentTxOuts(ArrayList<Transaction> avaliateTransactions, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
         //UNDONE
         ArrayList<UnspentTxOut> newUnspentTxOuts = new ArrayList<UnspentTxOut>();
         for(int i=0; i<avaliateTransactions.size();i++)
@@ -358,7 +360,7 @@ public class Transaction {
         return result;
     }
     
-    private String getStringFromPublicKey(PublicKey publicKey) {
+    private static String getStringFromPublicKey(PublicKey publicKey) {
         byte[] encodedPublicKey = publicKey.getEncoded();
         return Base64.getEncoder().encodeToString(encodedPublicKey);
     }

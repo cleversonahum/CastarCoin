@@ -6,7 +6,7 @@ public class TxOut {
     public PublicKey address;
     public Integer amount;
     
-    TxOut(PublicKey address, int amount){
+    public TxOut(PublicKey address, int amount){
         this.address = address;
         this.amount = amount;
     }

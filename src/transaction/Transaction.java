@@ -21,13 +21,6 @@ public class Transaction {
     public ArrayList<TxOut> txOuts;
     public final Integer COINBASE_AMOUNT = 50;
     
-    public Transaction(String id, ArrayList<TxIn> txIns, ArrayList<TxOut> txOuts) {
-        this.id = id;
-        this.txIns = txIns;
-        this.txOuts = txOuts;
-    }
-    
-    
     private String getTransactionId(Transaction transaction) { //Generating Transaction ID
         String txInContent = "", txOutContent = "", hash="";
         for(int i=0; i<transaction.txIns.size();i++) { //Getting Values from txIns and making a String
@@ -280,8 +273,8 @@ public class Transaction {
         
     }
       
-    private Transaction getCoinbaseTransaction(PublicKey address, int blockIndex) {
-        Transaction transaction = new Transaction(null,null,null);
+    private static Transaction getCoinbaseTransaction(PublicKey address, int blockIndex) {
+        Transaction transaction = new Transaction();
         TxIn txIn = new TxIn();
         txIn.signature = "";
         txIn.txOutId = "";
@@ -343,7 +336,7 @@ public class Transaction {
         return resultingUnspentTxOuts;
     }
     
-    private ArrayList<UnspentTxOut> processTransactions(ArrayList<Transaction> avaliateTransactions, ArrayList<UnspentTxOut> avaliateUnspentTxOuts, int blockIndex) {
+    public static ArrayList<UnspentTxOut> processTransactions(ArrayList<Transaction> avaliateTransactions, ArrayList<UnspentTxOut> avaliateUnspentTxOuts, int blockIndex) {
         if(!validateBlockTransactions(avaliateTransactions, avaliateUnspentTxOuts, blockIndex)) {
             System.out.println("Invalid Block Transaction");
             return null;

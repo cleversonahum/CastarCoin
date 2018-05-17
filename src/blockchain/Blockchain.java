@@ -1,17 +1,41 @@
 package blockchain;
 
+import transaction.*;
+import wallet.*;
 import java.util.Date;
 import java.util.Base64;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.text.SimpleDateFormat;
 import java.security.MessageDigest;
+import java.security.PublicKey;
 import java.lang.StringBuilder;
 import java.lang.Math;
 
 public class Blockchain {
     
     public Blockchain() {
+        //Init Genesis Transaction
+        this.genesisTransaction.id="e655f6a5f26dc9b4cac6e46f52336428287759cf81ef5ff10854f69d68f43fa3";
+        TxIn genesisTxIn = new TxIn();
+        genesisTxIn.txOutId = "";
+        genesisTxIn.txOutIndex = 0;
+        genesisTxIn.signature = "";
+        this.genesisTransaction.txIns.add(genesisTxIn);
+        PublicKey genesisPublicKey = null;
+        this.genesisTransaction.txOuts.add(new TxOut(genesisPublicKey, 50));
+        
+        //Init Genesis Block
+        ArrayList<Transaction> genesisTransactionToBlock = new ArrayList<Transaction>();
+        genesisTransactionToBlock.add(genesisTransaction);
+        this.genesisBlock = new Block(0, "91a73664bc84c0baa1fc75ea6e4aa6d1d20c5df664c724e3159aefc2e1186627", "", new Date(System.currentTimeMillis()), genesisTransactionToBlock, 0, 0);
+        
+        //Init Blockchain
         this.blockchain.add(genesisBlock);
+        
+        //Init UnspentTxOut
+        ArrayList<UnspentTxOut> genesisUnpentTxout = new ArrayList<UnspentTxOut>();
+        this.unspentTxOuts= Transaction.processTransactions(this.blockchain.get(0).data, genesisUnpentTxout,0);
     }
     
     private ArrayList<Block> blockchain = new ArrayList<Block>();
@@ -20,10 +44,23 @@ public class Blockchain {
     private final int LEVEL_ADJUSTMENT_INTERVAL = 10;
     private final int TIMESTAMP_VALIDATION = 60000;
     
-    final public Block genesisBlock = new Block(0, "816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7", "", new Date(System.currentTimeMillis()), "Genesis Block", 0, 0); //First Block into Chain
+    final public Transaction genesisTransaction = new Transaction(); //Initiated in constructor
+    
+    final public Block genesisBlock; //First Block into Chain, initiated in constructor
+    
+    public ArrayList<UnspentTxOut> unspentTxOuts;
     
     public ArrayList<Block> getBlockchain() { //Get all blocks
         return this.blockchain;
+    }
+    
+    public ArrayList<UnspentTxOut> getUnspentTxOuts() {
+        return this.unspentTxOuts;
+    }
+    
+    public void setUnspentTxOuts(ArrayList<UnspentTxOut> newUnspentTxOut) {
+        System.out.println("Replacing UnspentTxOuts");
+        this.unspentTxOuts = newUnspentTxOut;
     }
     
     public Block getLastBlock() { //Get the last block added
@@ -129,15 +166,25 @@ public class Blockchain {
             System.out.println("Received Blockchain Invalid");
     }
     
-    public Block generateNextBlock(String blockData) { //Making a a new value into a Block
-        Block previousBlock = getLastBlock();
-        int nextIndex = previousBlock.index + 1;
-        int level = getLevel(getBlockchain());
-        Date nextTimestamp = new Date(System.currentTimeMillis());
-        Block newBlock = findBlock(nextIndex, previousBlock.hash, nextTimestamp, blockData, level);
-        addBlock(newBlock);
-        //BroadcastLatest UNDONE
-        return newBlock;
+//    public Block generateNextBlock(String blockData) { //Making a a new value into a Block
+//        Block previousBlock = getLastBlock();
+//        int nextIndex = previousBlock.index + 1;
+//        int level = getLevel(getBlockchain());
+//        Date nextTimestamp = new Date(System.currentTimeMillis());
+//        Block newBlock = findBlock(nextIndex, previousBlock.hash, nextTimestamp, blockData, level);
+//        addBlock(newBlock);
+//        //BroadcastLatest UNDONE
+//        return newBlock;
+//    } OLD FUNCTION
+
+    private Block generateNextBlock() {
+        Transaction coinbaseTx = Transaction.getCoinbaseTransaction(Wallet.getPublicFromWallet(), getLastBlock().index+1);
+        ArrayList<Transaction> transactionPool = TxPool.getTransactionPool();
+        transactionPool.add(0, coinbaseTx);
+        ArrayList<Transaction> blockData = transactionPool;
+        
+        return generateRawNextBlock(blockData);
+        //UNDONE
     }
     
     public void printBlockchain(ArrayList<Block> blocks) {  //Print the blockchain (LOGS)
@@ -214,6 +261,25 @@ public class Blockchain {
         }
         else
             return true;
+    }
+    
+    private Block generateRawNextBlock(ArrayList<Transaction> blockData) {
+        Block previousBlock = getLastBlock();
+        int level = getLevel(getBlockchain());
+        int nextIndex = previousBlock.index + 1;
+        Date nextTimestamp = getCurrentTimestamp();
+        Block newBlock = findBlock(nextIndex, previousBlock.hash, nextTimestamp, blockData, level);
+        if(addBlockToChain(newBlock)) {
+            //BROADCAST FUNCTION UNDONE
+            return newBlock;
+        }
+        else
+            return null;
+    }
+    
+    private SOMETHING getMyUnspentTransactionOutputs() {
+        return Wallet.findUnspentTxOuts(Wallet.getPublicFromWallet(), getUnspentTxOuts());
+        //UNDONE
     }
 
 }

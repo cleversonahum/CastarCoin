@@ -33,14 +33,26 @@ public class TxPool {
     }
 
     private ArrayList<TxIn> getTxPoolIns(ArrayList<Transaction> aTransactionPool) {
-        // TODO: return the correct array
-        //return _(aTransactionPool).map((tx) => tx.txIns).flatten().value();
-        return new ArrayList<>();
+        // Add all unique TxIn in transaction pool
+        ArrayList<TxIn> txIn = new ArrayList<>();
+
+        for (Transaction tx : aTransactionPool) {
+            for (TxIn ti : tx.txIns) {
+                if(!containsTxIn(txIn, ti)){
+                    txIn.add(ti);
+                }
+            }
+        }
+
+        return txIn;
     }
 
     private boolean containsTxIn(ArrayList<TxIn> txIns, TxIn txIn) {
-        // TODO: a transaction cannot by added if any of the transaction inputs are already found in the existing transaction pool
-        //return _.find(txPoolIns, ((txPoolIn) => { txIn.txOutIndex === txPoolIn.txOutIndex && txIn.txOutId === txPoolIn.txOutId;}));
+        for (TxIn ti : txIns) {
+            if((ti.txOutIndex == txIn.txOutIndex) && (ti.txOutId.equals(txIn.txOutId))){
+                return true;
+            }
+        }
         return false;
     }
 
@@ -58,10 +70,12 @@ public class TxPool {
     }
 
     private boolean hasTxIn(TxIn txIn, ArrayList<UnspentTxOut> unspentTxOuts) {
-        boolean foundTxIn = false;
-        // TODO: search txIn
-        //foundTxIn = unspentTxOuts.find((uTxO: UnspentTxOut) => { return uTxO.txOutId === txIn.txOutId && uTxO.txOutIndex === txIn.txOutIndex;});
-        return foundTxIn;
+        for (UnspentTxOut to : unspentTxOuts) {
+            if((to.txOutIndex == txIn.txOutIndex) && (to.txOutId.equals(txIn.txOutId))){
+                return true;
+            }
+        }
+        return false;
     }
 
     public void updateTransactionPool(ArrayList<UnspentTxOut> unspentTxOuts) {
@@ -78,9 +92,14 @@ public class TxPool {
         }
 
         if (invalidTxs.size() > 0) {
-            System.out.println("removing the following transactions from txPool: " + invalidTxs.toString());
-            // TODO: remove invalidTxs from transactionPool
-            //transactionPool = _.without(transactionPool, ...invalidTxs);
+            System.out.println("Removing invalid transactions from transaction pool.");
+            for (Transaction txv : this.txPool) {
+                for (Transaction txi : invalidTxs) {
+                    if(txv == txi){
+                        this.txPool.remove(txi);
+                    }
+                }
+            }
         }
     }
 }

@@ -14,10 +14,10 @@ public class Wallet {
 	
 	private final String PRIVATE_KEY_LOCATION = "/keystore.jks";
 	
-	public Transaction createTransaction(PublicKey receiverAddress, int amount, String privateKey, ArrayList<UnspentTxOut> unspentTxOuts,
+	public Transaction createTransaction(PublicKey receiverAddress, int amount, PrivateKey privateKey, ArrayList<UnspentTxOut> unspentTxOuts,
 			ArrayList<Transaction> txPool) {
 				
-		PublicKey myAddress = getPublicKey(privateKey);
+		PublicKey myAddress = Transaction.getPublicKey(privateKey);
 		
 		ArrayList<UnspentTxOut> myUnspentTxOutsA = new ArrayList<UnspentTxOut>();
 		
@@ -32,12 +32,25 @@ public class Wallet {
 		ArrayList<UnspentTxOut> includedUnspentTxOuts = findTxPoolForAmountA(amount, myUnspentTxOuts);
 		int leftOverAmount = findTxPoolForAmountB(amount, myUnspentTxOuts);
 		
-		ArrayList<TxIn> unsignedTxIns = includedUnspentTxOuts.map(toUnsignedTxIn);
+		ArrayList<TxIn> unsignedTxIns = new ArrayList<TxIn>();
+		
+		for(UnspentTxOut value : includedUnspentTxOuts) {
+			
+			unsignedTxIns.add(toUnsignedTxIn(value));
+			
+		}
 		
 		Transaction tx = new Transaction();
 		tx.txIns = unsignedTxIns;
 		tx.txOuts = createTxOuts(receiverAddress, myAddress, amount, leftOverAmount);
-		tx.id = getTransactionId(tx);
+		tx.id = Transaction.getTransactionId(tx);
+		
+		for(int i = 0; i < tx.txIns.size(); i++) {
+			
+			tx.txIns.get(i).signature = Transaction.signTxIn(tx,i,privateKey, unspentTxOuts);
+			
+		}
+		
 		
 		return tx;
 		

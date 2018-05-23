@@ -17,8 +17,8 @@ import java.nio.charset.StandardCharsets;
 
 public class Transaction {
     public String id;
-    public ArrayList<TxIn> txIns;
-    public ArrayList<TxOut> txOuts;
+    public ArrayList<TxIn> txIns = new ArrayList<>();
+    public ArrayList<TxOut> txOuts = new ArrayList<>();
     public static final Integer COINBASE_AMOUNT = 50;
     
     public static String getTransactionId(Transaction transaction) { //Generating Transaction ID

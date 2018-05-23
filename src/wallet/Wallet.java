@@ -3,11 +3,16 @@ package wallet;
 import java.io.Console;
 import java.util.ArrayList;
 
+import java.security.KeyStore;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+
 import transaction.*;
 public class Wallet {
 
 	
-	public String privateKeyLocation = 
+	private final String PRIVATE_KEY_LOCATION = "/keystore.jks";
 	
 	public Transaction createTransaction(String receiverAddress, int amount, String privateKey, ArrayList<UnspentTxOut> unspentTxOuts,
 			ArrayList<Transaction> txPool) {
@@ -119,24 +124,21 @@ public class Wallet {
 		return txIn;
 	}
 	
-	public String getPrivateFromWallet() {
+	public PrivateKey getPrivateFromWallet() {
+	    
+		return getKeyPairFromKeyStore().getPrivate();
+	}
 	
+	public PublicKey getPublicFromWallet() {
+		
+		return getKeyPairFromKeyStore().getPublic();
+	}
+	
+	/*public String generatePrivateKey() {
+		
 		
 		return null;
 	}
-	
-	public String getPublicFromWallet() {
-		
-		
-		return null;
-	}
-	
-	public String generatePrivateKey() {
-		
-		
-		return null;
-	}
-	
 	public void initWallet() {
 		
 		if (existsSync(privateKeyLocation)) {
@@ -148,10 +150,9 @@ public class Wallet {
 	}
 	
 	
-	public void deteleWallet() {
+	public void deleteWallet() {
 		
-		
-	}
+	}*/ //Not used, "wallets" are the keys, and the keys are being generated using keytool outside program
 	
 	public int getBalance(String address, ArrayList<UnspentTxOut> unspentTxOuts) {
 		
@@ -172,6 +173,20 @@ public class Wallet {
 		}
 		
 	}
+	
+	public static KeyPair getKeyPairFromKeyStore() throws Exception { //Reading KeyPar from KeyStore
+        InputStream ins = RsaExample.class.getResourceAsStream(PRIVATE_KEY_LOCATION);
+
+        KeyStore keyStore = KeyStore.getInstance("JCEKS");
+        keyStore.load(ins, "s3cr3t".toCharArray());   //Keystore password
+        KeyStore.PasswordProtection keyPassword = new KeyStore.PasswordProtection("s3cr3t".toCharArray()); //Key password
+        KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry("mykey", keyPassword);
+        java.security.cert.Certificate cert = keyStore.getCertificate("mykey");
+        PublicKey publicKey = cert.getPublicKey();
+        PrivateKey privateKey = privateKeyEntry.getPrivateKey();
+    
+        return new KeyPair(publicKey, privateKey);
+    }
 	
 	
 }

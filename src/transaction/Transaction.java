@@ -21,7 +21,7 @@ public class Transaction {
     public ArrayList<TxOut> txOuts;
     public static final Integer COINBASE_AMOUNT = 50;
     
-    private static String getTransactionId(Transaction transaction) { //Generating Transaction ID
+    public static String getTransactionId(Transaction transaction) { //Generating Transaction ID
         String txInContent = "", txOutContent = "", hash="";
         for(int i=0; i<transaction.txIns.size();i++) { //Getting Values from txIns and making a String
             txInContent += transaction.txIns.get(i).txOutId + transaction.txIns.get(i).txOutIndex;
@@ -290,7 +290,7 @@ public class Transaction {
         return transaction;
     }
 
-    private String signTxIn(Transaction transaction, int txInIndex, PrivateKey privateKey, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
+    public static String signTxIn(Transaction transaction, int txInIndex, PrivateKey privateKey, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
         String result = "";
         TxIn txIn = transaction.txIns.get(txInIndex);
         String dataToSign = transaction.id;
@@ -346,7 +346,7 @@ public class Transaction {
         return updateUnspentTxOuts(avaliateTransactions, avaliateUnspentTxOuts);
     }
     
-    private PublicKey getPublicKey(PrivateKey avaliatePrivateKey) { //Making a public key from private
+    public static PublicKey getPublicKey(PrivateKey avaliatePrivateKey) { //Making a public key from private
         PublicKey result = null;
         
         try {

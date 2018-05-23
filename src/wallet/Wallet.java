@@ -7,6 +7,8 @@ import transaction.*;
 public class Wallet {
 
 	
+	public String privateKeyLocation = 
+	
 	public Transaction createTransaction(String receiverAddress, int amount, String privateKey, ArrayList<UnspentTxOut> unspentTxOuts,
 			ArrayList<Transaction> txPool) {
 				
@@ -116,4 +118,60 @@ public class Wallet {
 		
 		return txIn;
 	}
+	
+	public String getPrivateFromWallet() {
+	
+		
+		return null;
+	}
+	
+	public String getPublicFromWallet() {
+		
+		
+		return null;
+	}
+	
+	public String generatePrivateKey() {
+		
+		
+		return null;
+	}
+	
+	public void initWallet() {
+		
+		if (existsSync(privateKeyLocation)) {
+			
+			return;
+		}
+		
+		
+	}
+	
+	
+	public void deteleWallet() {
+		
+		
+	}
+	
+	public int getBalance(String address, ArrayList<UnspentTxOut> unspentTxOuts) {
+		
+		for(UnspentTxOut value : unspentTxOuts) {
+			
+			if(address == value.address.toString()) return value.amount;
+			
+		}	
+		
+	}
+	
+	public UnspentTxOut findUnspentTxOuts(String ownerAddress, ArrayList<UnspentTxOut> unspentTxOuts) {
+		
+		for(UnspentTxOut value : unspentTxOuts) {
+			
+			if(ownerAddress == value.address.toString()) return value;
+			
+		}
+		
+	}
+	
+	
 }

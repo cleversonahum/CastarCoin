@@ -14,16 +14,16 @@ public class Wallet {
 	
 	private final String PRIVATE_KEY_LOCATION = "/keystore.jks";
 	
-	public Transaction createTransaction(String receiverAddress, int amount, String privateKey, ArrayList<UnspentTxOut> unspentTxOuts,
+	public Transaction createTransaction(PublicKey receiverAddress, int amount, String privateKey, ArrayList<UnspentTxOut> unspentTxOuts,
 			ArrayList<Transaction> txPool) {
 				
-		String myAddress = getPublicKey(privateKey);
+		PublicKey myAddress = getPublicKey(privateKey);
 		
 		ArrayList<UnspentTxOut> myUnspentTxOutsA = new ArrayList<UnspentTxOut>();
 		
 		for(UnspentTxOut value : unspentTxOuts) {
 			
-			if(value.address == myAddress) myUnspentTxOutsA.add(value);
+			if(value.address.equals(myAddress)) myUnspentTxOutsA.add(value);
 			
 		}
 		
@@ -43,7 +43,7 @@ public class Wallet {
 		
 	}
 	
-	private ArrayList<TxOut> createTxOuts(String receiverAddress, String myAddress, int amount, int leftOverAmount) {
+	private ArrayList<TxOut> createTxOuts(PublicKey receiverAddress, PublicKey myAddress, int amount, int leftOverAmount) {
 		
 		TxOut txOut1 = new TxOut(receiverAddress, amount);
 		ArrayList<TxOut> txOut = new ArrayList<TxOut>();
@@ -59,25 +59,40 @@ public class Wallet {
 	}
 
 	private ArrayList<UnspentTxOut> filterTxPoolTxs(ArrayList<UnspentTxOut> myUnspentTxOutsA, ArrayList<Transaction> txPool) {
+		ArrayList<TxIn> txIns = new ArrayList<TxIn>();
 		
-		//ArrayList<TxIn> txIns = COMPLETAR
-		
-		ArrayList<UnspentTxOut> removable = new ArrayList<UnspentTxOut>();
-	
-		for(UnspentTxOut value : myUnspentTxOutsA) {
+		for(Transaction value : txPool) {
 			
-			//TcIn txIn = COMPLETAR
-			
-			if(txIn == null) {
+			for(TxIn tx : value.txIns) {
 				
-			}else {
+				if(tx != null) txIns.add(tx);
 				
-				removable.add(value);
 			}
 			
 		}
+		
+	
+		ArrayList<UnspentTxOut> filtered = new ArrayList<UnspentTxOut>();
+		
+		for(UnspentTxOut value : myUnspentTxOutsA) {
+			
+			TxIn txin = null;
+			
+			for(TxIn aTxIn : txIns) {
 				
-		return null;
+				if(aTxIn.txOutIndex == value.txOutIndex && aTxIn.txOutId == value.txOutId) {
+					txin = aTxIn;
+					break;
+				}
+		
+			} 
+			
+			if(txin != null) filtered.add(value); 
+			
+					
+		}
+				
+		return filtered;
 	}
 
 	private ArrayList<UnspentTxOut> findTxPoolForAmountA(int amount, ArrayList<UnspentTxOut> myUnspentTxOuts) {
@@ -134,44 +149,32 @@ public class Wallet {
 		return getKeyPairFromKeyStore().getPublic();
 	}
 	
-	/*public String generatePrivateKey() {
+	public int getBalance(PublicKey address, ArrayList<UnspentTxOut> unspentTxOuts) {
 		
-		
-		return null;
-	}
-	public void initWallet() {
-		
-		if (existsSync(privateKeyLocation)) {
-			
-			return;
-		}
-		
-		
-	}
-	
-	
-	public void deleteWallet() {
-		
-	}*/ //Not used, "wallets" are the keys, and the keys are being generated using keytool outside program
-	
-	public int getBalance(String address, ArrayList<UnspentTxOut> unspentTxOuts) {
+		int balance = 0;
 		
 		for(UnspentTxOut value : unspentTxOuts) {
 			
-			if(address == value.address.toString()) return value.amount;
+			if(address == value.address) balance = value.amount;
 			
 		}	
 		
+		return balance;
+		
 	}
 	
-	public UnspentTxOut findUnspentTxOuts(String ownerAddress, ArrayList<UnspentTxOut> unspentTxOuts) {
+	public UnspentTxOut findUnspentTxOuts(PublicKey ownerAddress, ArrayList<UnspentTxOut> unspentTxOuts) {
+		
+		UnspentTxOut txout = null;
 		
 		for(UnspentTxOut value : unspentTxOuts) {
 			
-			if(ownerAddress == value.address.toString()) return value;
+			if(ownerAddress == value.address) txout = value;
 			
 		}
 		
+		return txout;
+	
 	}
 	
 	public static KeyPair getKeyPairFromKeyStore() throws Exception { //Reading KeyPar from KeyStore

@@ -1,6 +1,7 @@
 package wallet;
 
-import java.io.Console;
+import java.io.InputStream;
+
 import java.util.ArrayList;
 
 import java.security.KeyStore;
@@ -12,7 +13,7 @@ import transaction.*;
 public class Wallet {
 
 	
-	private final String PRIVATE_KEY_LOCATION = "/keystore.jks";
+	private static final String PRIVATE_KEY_LOCATION = "/keystore.jks";
 	
 	public Transaction createTransaction(PublicKey receiverAddress, int amount, PrivateKey privateKey, ArrayList<UnspentTxOut> unspentTxOuts,
 			ArrayList<Transaction> txPool) {
@@ -153,13 +154,18 @@ public class Wallet {
 	}
 	
 	public PrivateKey getPrivateFromWallet() {
-	    
+	   try {
 		return getKeyPairFromKeyStore().getPrivate();
+	   }catch(Exception e) {e.printStackTrace();}
+       return null; 
+        
 	}
 	
 	public PublicKey getPublicFromWallet() {
-		
+		try{
 		return getKeyPairFromKeyStore().getPublic();
+		}catch(Exception e) {e.printStackTrace();}
+       return null; 
 	}
 	
 	public int getBalance(PublicKey address, ArrayList<UnspentTxOut> unspentTxOuts) {
@@ -191,7 +197,7 @@ public class Wallet {
 	}
 	
 	public static KeyPair getKeyPairFromKeyStore() throws Exception { //Reading KeyPar from KeyStore
-        InputStream ins = RsaExample.class.getResourceAsStream(PRIVATE_KEY_LOCATION);
+        InputStream ins = Wallet.class.getResourceAsStream(PRIVATE_KEY_LOCATION);
 
         KeyStore keyStore = KeyStore.getInstance("JCEKS");
         keyStore.load(ins, "s3cr3t".toCharArray());   //Keystore password

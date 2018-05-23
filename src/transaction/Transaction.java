@@ -275,7 +275,7 @@ public class Transaction {
         
     }
       
-    private static Transaction getCoinbaseTransaction(PublicKey address, int blockIndex) {
+    public static Transaction getCoinbaseTransaction(PublicKey address, int blockIndex) {
         Transaction transaction = new Transaction();
         TxIn txIn = new TxIn();
         txIn.signature = "";

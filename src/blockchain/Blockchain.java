@@ -5,7 +5,6 @@ import wallet.*;
 import java.util.Date;
 import java.util.Base64;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.text.SimpleDateFormat;
 import java.security.MessageDigest;
 import java.security.PublicKey;
@@ -129,7 +128,7 @@ public class Blockchain {
     }
     
     private Boolean isValidGenesisBlock(Block validateBlock) {
-        return ((this.genesisBlock.index == validateBlock.index) &&                         (this.genesisBlock.hash.equals(validateBlock.hash)) && (this.genesisBlock.previousHash.equals(validateBlock.previousHash)) && (this.genesisBlock.timestamp.equals(validateBlock.timestamp)) && (this.genesisBlock.data.equals(validateBlock.data)));
+        return ((this.genesisBlock.index == validateBlock.index) && (this.genesisBlock.hash.equals(validateBlock.hash)) && (this.genesisBlock.previousHash.equals(validateBlock.previousHash)) && (this.genesisBlock.timestamp.equals(validateBlock.timestamp)) && (this.genesisBlock.data.equals(validateBlock.data)));
     }
     
     private ArrayList<UnspentTxOut> isValidChain(ArrayList<Block> validateBlockchain) {
@@ -156,7 +155,7 @@ public class Blockchain {
         return avaliateUnspentTxOuts;    
     }
     
-    private Boolean addBlockToChain(Block newBlock) {
+    private Boolean addBlockToChain(Block newBlock, TxPool txPool) {
         if(isValidNewBlock(newBlock, getLastBlock())) {
             ArrayList<UnspentTxOut> retVal = Transaction.processTransactions(newBlock.data, getUnspentTxOuts(), newBlock.index);
             if(retVal == null) {
@@ -166,7 +165,7 @@ public class Blockchain {
             else {
                 this.blockchain.add(newBlock);
                 setUnspentTxOuts(retVal);
-                TxPool.updateTransactionPool(unspentTxOuts);
+                txPool.updateTransactionPool(unspentTxOuts);
                 return true;
             }
         }
@@ -182,7 +181,7 @@ public class Blockchain {
         return sum;
     }
     
-    private void replaceChain(ArrayList<Block> newBlocks) {
+    private void replaceChain(ArrayList<Block> newBlocks, TxPool txPool) {
         ArrayList<UnspentTxOut> avaliateUnspentTxOuts = isValidChain(newBlocks);
         Boolean validChain = (avaliateUnspentTxOuts != null);
         
@@ -190,24 +189,24 @@ public class Blockchain {
             System.out.println("Blockchain received is valid, the current blockchain was replaced by the received blockchain");
             this.blockchain = newBlocks;
             setUnspentTxOuts(avaliateUnspentTxOuts);
-            TxPool.updateTransactionPool(unspentTxOuts);
+            txPool.updateTransactionPool(unspentTxOuts);
             //FUNCTION TO BROADCAST THIS, UNDONE
         }
         else
             System.out.println("Received Blockchain Invalid");
     }
 
-    private Block generateNextBlock() {
-        Transaction coinbaseTx = Transaction.getCoinbaseTransaction(Wallet.getPublicFromWallet(), getLastBlock().index+1);
-        ArrayList<Transaction> transactionPool = TxPool.getTransactionPool();
+    private Block generateNextBlock(Wallet wallet, TxPool txPool) {
+        Transaction coinbaseTx = Transaction.getCoinbaseTransaction(wallet.getPublicFromWallet(), getLastBlock().index+1);
+        ArrayList<Transaction> transactionPool = txPool.getTransactionPool();
         transactionPool.add(0, coinbaseTx);
         ArrayList<Transaction> blockData = transactionPool;
         
-        return generateRawNextBlock(blockData);
+        return generateRawNextBlock(blockData, txPool);
         //UNDONE
     }
     
-    private Block generateNextBlockTransaction(PublicKey receiverAddress, Integer amount) {
+    private Block generateNextBlockTransaction(PublicKey receiverAddress, Integer amount, Wallet wallet, TxPool txPool) {
         if(!Transaction.isValidAddress(receiverAddress)) {
             System.out.println("Invalid Address");
             throw new java.lang.RuntimeException("Invalid Address");
@@ -217,12 +216,12 @@ public class Blockchain {
             throw new java.lang.RuntimeException("Invalid Amount");
         }
         
-        Transaction coinbaseTx = Transaction.getCoinbaseTransaction(Wallet.getPublicFromWallet(), getLastBlock().index+1);
-        Transaction tx = Wallet.createTransaction(receiverAddress, amount, Wallet.getPrivateFromWallet(), getUnspentTxOuts(), TxPool.getTransactionPool());
+        Transaction coinbaseTx = Transaction.getCoinbaseTransaction(wallet.getPublicFromWallet(), getLastBlock().index+1);
+        Transaction tx = wallet.createTransaction(receiverAddress, amount, wallet.getPrivateFromWallet(), getUnspentTxOuts(), txPool.getTransactionPool());
         ArrayList<Transaction> blockData = new ArrayList<Transaction>();
         blockData.add(coinbaseTx);
         blockData.add(tx);
-        return generateRawNextBlock(blockData);
+        return generateRawNextBlock(blockData, txPool);
         //UNDONE
     }
 
@@ -302,13 +301,13 @@ public class Blockchain {
             return true;
     }
     
-    private Block generateRawNextBlock(ArrayList<Transaction> blockData) {
+    private Block generateRawNextBlock(ArrayList<Transaction> blockData, TxPool txPool) {
         Block previousBlock = getLastBlock();
         int level = getLevel(getBlockchain());
         int nextIndex = previousBlock.index + 1;
         Date nextTimestamp = getCurrentTimestamp();
         Block newBlock = findBlock(nextIndex, previousBlock.hash, nextTimestamp, blockData, level);
-        if(addBlockToChain(newBlock)) {
+        if(addBlockToChain(newBlock, txPool)) {
             //BROADCAST FUNCTION UNDONE
             return newBlock;
         }
@@ -316,24 +315,24 @@ public class Blockchain {
             return null;
     }
     
-    private SOMETHING getMyUnspentTransactionOutputs() {
-        return Wallet.findUnspentTxOuts(Wallet.getPublicFromWallet(), getUnspentTxOuts());
+    private UnspentTxOut getMyUnspentTransactionOutputs(Wallet wallet) {
+        return wallet.findUnspentTxOuts(wallet.getPublicFromWallet(), getUnspentTxOuts());
     }
     
-    private int getAccountBalance () {
-        return Wallet.getBalance(Wallet.getPublicFromWallet(), getUnspentTxOuts());
+    private int getAccountBalance (Wallet wallet) {
+        return wallet.getBalance(wallet.getPublicFromWallet(), getUnspentTxOuts());
     }
     
-    private Transaction sendTransaction(PublicKey address, int amount) {
-        Transaction tx = Wallet.createTransaction(address, amount, Wallet.getPrivateFromWallet(), getUnspentTxOuts(), TxPool.getTransactionPool());
-        TxPool.addToTransactionPool(tx, getUnspentTxOuts());
+    private Transaction sendTransaction(PublicKey address, int amount, Wallet wallet, TxPool txPool) {
+        Transaction tx = wallet.createTransaction(address, amount, wallet.getPrivateFromWallet(), getUnspentTxOuts(), txPool.getTransactionPool());
+        txPool.addToTransactionPool(tx, getUnspentTxOuts());
         //BROADCAST UNDONE
         
         return tx;
     }
     
-    private void handleReceivedTransaction(Transaction transaction) {
-        TxPool.addToTransactionPool(transaction, getUnspentTxOuts());
+    private void handleReceivedTransaction(Transaction transaction, TxPool txPool) {
+        txPool.addToTransactionPool(transaction, getUnspentTxOuts());
     }
 
 }

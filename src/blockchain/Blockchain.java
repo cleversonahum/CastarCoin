@@ -2,6 +2,9 @@ package blockchain;
 
 import transaction.*;
 import wallet.*;
+
+import java.math.BigInteger;
+import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
 import java.util.Base64;
 import java.util.ArrayList;
@@ -21,7 +24,25 @@ public class Blockchain {
         genesisTxIn.txOutIndex = 0;
         genesisTxIn.signature = "";
         this.genesisTransaction.txIns.add(genesisTxIn);
-        PublicKey genesisPublicKey = null;
+        // Needs genesis PrivateKey ?
+        PublicKey genesisPublicKey = new PublicKey() {
+            @Override
+            public String getAlgorithm() {
+                return null;
+            }
+
+            @Override
+            public String getFormat() {
+                return null;
+            }
+
+            @Override
+            public byte[] getEncoded() {
+                return new byte[0];
+            }
+        };
+        System.out.println("Generated fake genesisPublicKey");
+
         this.genesisTransaction.txOuts.add(new TxOut(genesisPublicKey, 50));
         
         //Init Genesis Block

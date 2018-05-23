@@ -16,7 +16,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 
 public class Transaction {
-    public String id;
+    public String id = "";
     public ArrayList<TxIn> txIns = new ArrayList<>();
     public ArrayList<TxOut> txOuts = new ArrayList<>();
     public static final Integer COINBASE_AMOUNT = 50;
@@ -26,7 +26,7 @@ public class Transaction {
         for(int i=0; i<transaction.txIns.size();i++) { //Getting Values from txIns and making a String
             txInContent += transaction.txIns.get(i).txOutId + transaction.txIns.get(i).txOutIndex;
         }
-        
+
         for(int i=0; i<transaction.txOuts.size();i++) { //Getting Values from txOuts and making a String
             txOutContent += getStringFromPublicKey(transaction.txOuts.get(i).address) + transaction.txOuts.get(i).amount;
         }

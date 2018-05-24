@@ -189,8 +189,7 @@ public class Wallet {
 		UnspentTxOut txout = null;
 		
 		for(UnspentTxOut value : unspentTxOuts) {
-			
-			if(ownerAddress == value.address) txout = value;
+			if(ownerAddress.equals(value.address)) txout = value;
 			
 		}
 		

@@ -12,7 +12,7 @@ public class TxPool {
 
     public void addToTransactionPool(Transaction tx, ArrayList<UnspentTxOut> unspentTxOuts) {
 
-        if (!tx.validateTransaction(tx, unspentTxOuts)) {
+        if (!Transaction.validateTransaction(tx, unspentTxOuts)) {
             try {
                 throw new Exception("Trying to add invalid tx to pool");
             } catch (Exception e) {

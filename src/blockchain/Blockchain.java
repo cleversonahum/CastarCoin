@@ -325,15 +325,15 @@ public class Blockchain {
             return null;
     }
     
-    private UnspentTxOut getMyUnspentTransactionOutputs(Wallet wallet) {
+    public UnspentTxOut getMyUnspentTransactionOutputs(Wallet wallet) {
         return wallet.findUnspentTxOuts(wallet.getPublicFromWallet(), getUnspentTxOuts());
     }
     
-    private int getAccountBalance (Wallet wallet) {
+    public int getAccountBalance (Wallet wallet) {
         return wallet.getBalance(wallet.getPublicFromWallet(), getUnspentTxOuts());
     }
     
-    private Transaction sendTransaction(PublicKey address, int amount, Wallet wallet, TxPool txPool) {
+    public Transaction sendTransaction(PublicKey address, int amount, Wallet wallet, TxPool txPool) {
         Transaction tx = wallet.createTransaction(address, amount, wallet.getPrivateFromWallet(), getUnspentTxOuts(), txPool.getTransactionPool());
         txPool.addToTransactionPool(tx, getUnspentTxOuts());
         //BROADCAST UNDONE

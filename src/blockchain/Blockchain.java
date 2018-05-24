@@ -2,6 +2,9 @@ package blockchain;
 
 import transaction.*;
 import wallet.*;
+
+import java.math.BigInteger;
+import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
 import java.util.Base64;
 import java.util.ArrayList;

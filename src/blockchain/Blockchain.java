@@ -7,6 +7,8 @@ import java.util.Base64;
 import java.util.ArrayList;
 import java.text.SimpleDateFormat;
 import java.security.MessageDigest;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.PublicKey;
 import java.lang.StringBuilder;
 import java.lang.Math;
@@ -21,8 +23,14 @@ public class Blockchain {
         genesisTxIn.txOutIndex = 0;
         genesisTxIn.signature = "";
         this.genesisTransaction.txIns.add(genesisTxIn);
-        PublicKey genesisPublicKey = null;
-        this.genesisTransaction.txOuts.add(new TxOut(genesisPublicKey, 50));
+        try{
+            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+            keyGen.initialize(1024);
+            KeyPair pair = keyGen.generateKeyPair();
+            PublicKey genesisPublicKey = pair.getPublic();
+            this.genesisTransaction.txOuts.add(new TxOut(genesisPublicKey, 50));
+        }
+        catch(Exception e){e.printStackTrace();}
         
         //Init Genesis Block
         ArrayList<Transaction> genesisTransactionToBlock = new ArrayList<Transaction>();

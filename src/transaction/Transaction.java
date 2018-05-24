@@ -26,7 +26,6 @@ public class Transaction {
         for(int i=0; i<transaction.txIns.size();i++) { //Getting Values from txIns and making a String
             txInContent += transaction.txIns.get(i).txOutId + transaction.txIns.get(i).txOutIndex;
         }
-        
         for(int i=0; i<transaction.txOuts.size();i++) { //Getting Values from txOuts and making a String
             txOutContent += getStringFromPublicKey(transaction.txOuts.get(i).address) + transaction.txOuts.get(i).amount;
         }
@@ -343,6 +342,7 @@ public class Transaction {
             System.out.println("Invalid Block Transaction");
             return null;
         }
+
         return updateUnspentTxOuts(avaliateTransactions, avaliateUnspentTxOuts);
     }
     

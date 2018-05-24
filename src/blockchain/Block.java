@@ -9,7 +9,7 @@ public class Block {
     public String hash;
     public String previousHash;
     public Date timestamp;
-    public ArrayList<Transaction> data;
+    public ArrayList<Transaction> data = new ArrayList<>();
     public Integer level; //difficulty
     public Integer nonce;
     

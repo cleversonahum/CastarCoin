@@ -16,8 +16,9 @@ public class Main {
 	    TxPool txPool = new TxPool();
 	    Wallet wallet = new Wallet();
 	    
-	    blockchain.generateNextBlockTransaction(wallet.getPublicFromWallet(), 50, wallet, txPool);
-	    //blockchain.generateRawNextBlock();
+	    //blockchain.generateNextBlockTransaction(wallet.getPublicFromWallet(), 50, wallet, txPool); //It stopped in CreateTransaction() function because it is receiving a UnspentTxOut empty
+	    
+	    blockchain.generateNextBlock(wallet, txPool);
 
 		// Needs real keys
 		// To be removed

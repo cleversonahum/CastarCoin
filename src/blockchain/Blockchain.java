@@ -20,7 +20,6 @@ public class Blockchain {
     
     public Blockchain() {
         //Init Genesis Transaction
-        this.genesisTransaction.id="e655f6a5f26dc9b4cac6e46f52336428287759cf81ef5ff10854f69d68f43fa3";
         TxIn genesisTxIn = new TxIn();
         genesisTxIn.txOutId = "";
         genesisTxIn.txOutIndex = 0;
@@ -34,6 +33,7 @@ public class Blockchain {
             this.genesisTransaction.txOuts.add(new TxOut(genesisPublicKey, 50));
         }
         catch(Exception e){e.printStackTrace();}
+        this.genesisTransaction.id = Transaction.getTransactionId(this.genesisTransaction);
         
         //Init Genesis Block
         ArrayList<Transaction> genesisTransactionToBlock = new ArrayList<Transaction>();
@@ -207,14 +207,13 @@ public class Blockchain {
             System.out.println("Received Blockchain Invalid");
     }
 
-    private Block generateNextBlock(Wallet wallet, TxPool txPool) {
+    public Block generateNextBlock(Wallet wallet, TxPool txPool) {
         Transaction coinbaseTx = Transaction.getCoinbaseTransaction(wallet.getPublicFromWallet(), getLastBlock().index+1);
         ArrayList<Transaction> transactionPool = txPool.getTransactionPool();
         transactionPool.add(0, coinbaseTx);
         ArrayList<Transaction> blockData = transactionPool;
         
         return generateRawNextBlock(blockData, txPool);
-        //UNDONE
     }
     
     public Block generateNextBlockTransaction(PublicKey receiverAddress, Integer amount, Wallet wallet, TxPool txPool) {

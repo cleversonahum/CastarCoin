@@ -171,8 +171,8 @@ public class Transaction {
             System.out.println("The first transaction needs to be a coinbase");
             return false;
         }
-        else if (getTransactionId(transaction).equals(transaction.id)) {
-            System.out.println("Invalid coinbase TX id: "+transaction.id);
+        else if (!getTransactionId(transaction).equals(transaction.id)) {
+            System.out.println("Invalid coinbase TX id: "+transaction.id+"\nExpected: "+getTransactionId(transaction));
             return false;
         }
         else if(transaction.txIns.size() != 1) {

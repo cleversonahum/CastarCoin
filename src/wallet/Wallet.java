@@ -28,7 +28,7 @@ public class Wallet {
 			if(value.address.equals(myAddress)) myUnspentTxOutsA.add(value);
 			
 		}
-		
+
 		ArrayList<UnspentTxOut> myUnspentTxOuts = filterTxPoolTxs(myUnspentTxOutsA, txPool);
 		
 		ArrayList<UnspentTxOut> includedUnspentTxOuts = findTxPoolForAmountA(amount, myUnspentTxOuts);

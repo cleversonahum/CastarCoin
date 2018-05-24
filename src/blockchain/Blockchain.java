@@ -214,12 +214,12 @@ public class Blockchain {
         //UNDONE
     }
     
-    private Block generateNextBlockTransaction(PublicKey receiverAddress, Integer amount, Wallet wallet, TxPool txPool) {
+    public Block generateNextBlockTransaction(PublicKey receiverAddress, Integer amount, Wallet wallet, TxPool txPool) {
         if(!Transaction.isValidAddress(receiverAddress)) {
             System.out.println("Invalid Address");
             throw new java.lang.RuntimeException("Invalid Address");
         }
-        else if(amount instanceof Integer) {
+        else if(!(amount instanceof Integer)) {
             System.out.println("Invalid Amount");
             throw new java.lang.RuntimeException("Invalid Amount");
         }

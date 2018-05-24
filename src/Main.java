@@ -1,5 +1,6 @@
 import blockchain.*;
 import transaction.*;
+import wallet.*;
 
 
 public class Main {
@@ -9,6 +10,10 @@ public class Main {
 	    
 	    Blockchain blockchain = new Blockchain();
 	    TxPool txPool = new TxPool();
+	    Wallet wallet = new Wallet();
+	    
+	    blockchain.generateNextBlockTransaction(wallet.getPublicFromWallet(), 50, wallet, txPool);
+	    //blockchain.generateRawNextBlock();
 
     }
     

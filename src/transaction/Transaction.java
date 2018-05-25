@@ -80,9 +80,12 @@ public class Transaction {
     }
 
     private static UnspentTxOut findUnspentTxOut(String transactionId, int index, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
-        for(int i=0; i<avaliateUnspentTxOuts.size();i++)
+        for(int i=0; i<avaliateUnspentTxOuts.size();i++){
+            System.out.println(avaliateUnspentTxOuts.get(i).toString());
             if(avaliateUnspentTxOuts.get(i).txOutId.equals(transactionId) && avaliateUnspentTxOuts.get(i).txOutIndex == index)
                 return avaliateUnspentTxOuts.get(i);
+        }
+
         System.out.println("findUnspentTxOut() find nothing");
         return null;
     }
@@ -142,16 +145,15 @@ public class Transaction {
         
         if(hasTxInDuplicates(txIns))
             return false;
-        
-        avaliateTransaction.remove(0); //Removing first transaction
-        ArrayList<Transaction> normalTransactions = avaliateTransaction;//All transactions except the coinbaseTX
+          
+        ArrayList<Transaction> normalTransactions = new ArrayList<>(avaliateTransaction);
+        normalTransactions.remove(0); //All transactions except the coinbaseTX
         
         for(int i=0; i<normalTransactions.size();i++) //Verify if the Transactions are valid
             if(!validateTransaction(normalTransactions.get(i), avaliateUnspentTxOuts))
                 return false;
                 
         return true; 
-
     }
 
     private static Boolean hasTxInDuplicates(ArrayList<TxIn> txIns) { //Verify if there is repetead values into txIns
@@ -318,31 +320,53 @@ public class Transaction {
     }
 
     private static ArrayList<UnspentTxOut> updateUnspentTxOuts(ArrayList<Transaction> avaliateTransactions, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
-        //UNDONE
         ArrayList<UnspentTxOut> newUnspentTxOuts = new ArrayList<UnspentTxOut>();
         for(int i=0; i<avaliateTransactions.size();i++)
-            for(int j=0; j<avaliateTransactions.get(i).txOuts.size(); j++)
+            for(int j=0; j<avaliateTransactions.get(i).txOuts.size(); j++) 
                 newUnspentTxOuts.add(new UnspentTxOut(avaliateTransactions.get(i).id, i, avaliateTransactions.get(i).txOuts.get(j).address, avaliateTransactions.get(i).txOuts.get(j).amount));
+
                 
         ArrayList<UnspentTxOut> consumedTxOuts = new ArrayList<UnspentTxOut>();
         for(int i=0; i<avaliateTransactions.size();i++)
             for(int j=0; j<avaliateTransactions.get(i).txIns.size();j++)
                 consumedTxOuts.add(new UnspentTxOut(avaliateTransactions.get(i).txIns.get(j).txOutId, avaliateTransactions.get(i).txIns.get(j).txOutIndex, null, 0));
-                
+        System.out.println("");       
         ArrayList<UnspentTxOut> resultingUnspentTxOuts = new ArrayList<UnspentTxOut>(newUnspentTxOuts);
-        for(int i=0; i<avaliateUnspentTxOuts.size();i++)
+        for(int i=0; i<avaliateUnspentTxOuts.size();i++){
             if(findUnspentTxOut(avaliateUnspentTxOuts.get(i).txOutId, avaliateUnspentTxOuts.get(i).txOutIndex, consumedTxOuts)!=null)
                 resultingUnspentTxOuts.add(avaliateUnspentTxOuts.get(i));
+                System.out.println(avaliateUnspentTxOuts.get(i)+"LEMBRAR\n");
+            }
+
                 
         return resultingUnspentTxOuts;
     }
+//    const updateUnspentTxOuts = (aTransactions: Transaction[], aUnspentTxOuts: UnspentTxOut[]): UnspentTxOut[] => {
+//    const newUnspentTxOuts: UnspentTxOut[] = aTransactions
+//        .map((t) => {
+//            return t.txOuts.map((txOut, index) => new UnspentTxOut(t.id, index, txOut.address, txOut.amount));
+//        })
+//        .reduce((a, b) => a.concat(b), []);
+//
+//    const consumedTxOuts: UnspentTxOut[] = aTransactions
+//        .map((t) => t.txIns)
+//        .reduce((a, b) => a.concat(b), [])
+//        .map((txIn) => new UnspentTxOut(txIn.txOutId, txIn.txOutIndex, '', 0));
+//
+//    const resultingUnspentTxOuts = aUnspentTxOuts
+//        .filter(((uTxO) => !findUnspentTxOut(uTxO.txOutId, uTxO.txOutIndex, consumedTxOuts)))
+//        .concat(newUnspentTxOuts);
+//
+//    return resultingUnspentTxOuts;
+//};
     
     public static ArrayList<UnspentTxOut> processTransactions(ArrayList<Transaction> avaliateTransactions, ArrayList<UnspentTxOut> avaliateUnspentTxOuts, int blockIndex) {
+        //System.out.println("TESTE2: "+avaliateTransactions);
         if(!validateBlockTransactions(avaliateTransactions, avaliateUnspentTxOuts, blockIndex)) {
             System.out.println("Invalid Block Transaction");
             return null;
         }
-
+        //System.out.println("TESTE: "+avaliateTransactions);
         return updateUnspentTxOuts(avaliateTransactions, avaliateUnspentTxOuts);
     }
     

@@ -58,7 +58,7 @@ public class Blockchain {
     
     final public Block genesisBlock; //First Block into Chain, initiated in constructor
     
-    public ArrayList<UnspentTxOut> unspentTxOuts;
+    public ArrayList<UnspentTxOut> unspentTxOuts = new ArrayList<UnspentTxOut>();
     
     public ArrayList<Block> getBlockchain() { //Get all blocks
         return this.blockchain;
@@ -70,7 +70,7 @@ public class Blockchain {
     
     public void setUnspentTxOuts(ArrayList<UnspentTxOut> newUnspentTxOut) {
         System.out.println("Replacing UnspentTxOuts");
-        this.unspentTxOuts = newUnspentTxOut;
+        this.unspentTxOuts = new ArrayList<>(newUnspentTxOut);
     }
     
     public Block getLastBlock() { //Get the last block added
@@ -176,7 +176,7 @@ public class Blockchain {
             else {
                 this.blockchain.add(newBlock);
                 setUnspentTxOuts(retVal);
-                txPool.updateTransactionPool(unspentTxOuts);
+                txPool.updateTransactionPool(this.unspentTxOuts);
                 return true;
             }
         }

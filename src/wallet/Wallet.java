@@ -173,10 +173,9 @@ public class Wallet {
 	public int getBalance(PublicKey address, ArrayList<UnspentTxOut> unspentTxOuts) {
 		
 		int balance = 0;
-		
 		for(UnspentTxOut value : unspentTxOuts) {
-			
-			if(address == value.address) balance = value.amount;
+			if(address.equals(value.address))
+			     balance = value.amount;
 			
 		}	
 		

@@ -1,6 +1,7 @@
 package transaction;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class TxPool {
 
@@ -91,12 +92,19 @@ public class TxPool {
             }
         }
 
+        Iterator<Transaction> itV = this.txPool.iterator();
+        Iterator<Transaction> itI = invalidTxs.iterator();
+
         if (invalidTxs.size() > 0) {
             System.out.println("Removing invalid transactions from transaction pool.");
-            for (Transaction txv : this.txPool) {
-                for (Transaction txi : invalidTxs) {
-                    if(txv == txi){
-                        this.txPool.remove(txi);
+            while (itV.hasNext()) {
+                Transaction txV = itV.next();
+
+                while (itI.hasNext()){
+                    Transaction txI = itI.next();
+
+                    if(txV == txI){
+                        itV.remove();
                     }
                 }
             }

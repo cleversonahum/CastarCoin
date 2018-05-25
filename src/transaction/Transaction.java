@@ -80,13 +80,14 @@ public class Transaction {
     }
 
     private static UnspentTxOut findUnspentTxOut(String transactionId, int index, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
+        //System.out.println("ID: " + transactionId + " Index: " + index);
         for(int i=0; i<avaliateUnspentTxOuts.size();i++){
-            System.out.println(avaliateUnspentTxOuts.get(i).toString());
+            //System.out.println(avaliateUnspentTxOuts.get(i).toString());
             if(avaliateUnspentTxOuts.get(i).txOutId.equals(transactionId) && avaliateUnspentTxOuts.get(i).txOutIndex == index)
                 return avaliateUnspentTxOuts.get(i);
         }
 
-        System.out.println("findUnspentTxOut() find nothing");
+        //System.out.println("findUnspentTxOut() find nothing");
         return null;
     }
 
@@ -330,12 +331,12 @@ public class Transaction {
         for(int i=0; i<avaliateTransactions.size();i++)
             for(int j=0; j<avaliateTransactions.get(i).txIns.size();j++)
                 consumedTxOuts.add(new UnspentTxOut(avaliateTransactions.get(i).txIns.get(j).txOutId, avaliateTransactions.get(i).txIns.get(j).txOutIndex, null, 0));
-        System.out.println("");       
+        //System.out.println("");
         ArrayList<UnspentTxOut> resultingUnspentTxOuts = new ArrayList<UnspentTxOut>(newUnspentTxOuts);
         for(int i=0; i<avaliateUnspentTxOuts.size();i++){
             if(findUnspentTxOut(avaliateUnspentTxOuts.get(i).txOutId, avaliateUnspentTxOuts.get(i).txOutIndex, consumedTxOuts)!=null)
                 resultingUnspentTxOuts.add(avaliateUnspentTxOuts.get(i));
-                System.out.println(avaliateUnspentTxOuts.get(i)+"LEMBRAR\n");
+                //System.out.println(avaliateUnspentTxOuts.get(i)+"LEMBRAR\n");
             }
 
                 
@@ -387,5 +388,12 @@ public class Transaction {
     public static String getStringFromPublicKey(PublicKey publicKey) {
         byte[] encodedPublicKey = publicKey.getEncoded();
         return Base64.getEncoder().encodeToString(encodedPublicKey);
+    }
+
+    @Override
+    public String toString(){
+        return "Transaction ID: " + this.id +
+                "\nTransactions In:\n" + this.txIns.toString() +
+                "\nTransactions Out:\n" + this.txOuts.toString();
     }
 }

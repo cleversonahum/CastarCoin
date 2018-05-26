@@ -1,13 +1,14 @@
 package transaction;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class TxPool {
 
     private ArrayList<Transaction> txPool = new ArrayList<>();
 
     public ArrayList<Transaction> getTransactionPool() {
-        return this.txPool;
+        return new ArrayList<Transaction>(this.txPool);
     }
 
     public void addToTransactionPool(Transaction tx, ArrayList<UnspentTxOut> unspentTxOuts) {
@@ -71,6 +72,7 @@ public class TxPool {
 
     private boolean hasTxIn(TxIn txIn, ArrayList<UnspentTxOut> unspentTxOuts) {
         for (UnspentTxOut to : unspentTxOuts) {
+            System.out.println("Received_OutIndex: "+to.txOutIndex+"\nExpected: "+txIn.txOutIndex+"\nReceived_OutId: "+to.txOutId+"\nExpected: "+txIn.txOutId);
             if((to.txOutIndex == txIn.txOutIndex) && (to.txOutId.equals(txIn.txOutId))){
                 return true;
             }
@@ -81,7 +83,6 @@ public class TxPool {
     public void updateTransactionPool(ArrayList<UnspentTxOut> unspentTxOuts) {
 
         ArrayList<Transaction> invalidTxs = new ArrayList<>();
-
         for (Transaction tx : this.txPool) {
             for (TxIn txIn : tx.txIns) {
                 if (!hasTxIn(txIn, unspentTxOuts)) {
@@ -91,12 +92,19 @@ public class TxPool {
             }
         }
 
+        Iterator<Transaction> itV = this.txPool.iterator();
+        Iterator<Transaction> itI = invalidTxs.iterator();
+
         if (invalidTxs.size() > 0) {
             System.out.println("Removing invalid transactions from transaction pool.");
-            for (Transaction txv : this.txPool) {
-                for (Transaction txi : invalidTxs) {
-                    if(txv == txi){
-                        this.txPool.remove(txi);
+            while (itV.hasNext()) {
+                Transaction txV = itV.next();
+
+                while (itI.hasNext()){
+                    Transaction txI = itI.next();
+
+                    if(txV == txI){
+                        itV.remove();
                     }
                 }
             }

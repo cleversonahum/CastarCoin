@@ -19,11 +19,12 @@ public class Main {
 	    //Functions used into main.ts
 	    //From Transaction
 	    blockchain.generateNextBlock(wallet, txPool);
-	    //blockchain.generateNextBlock(wallet, txPool);
+	    blockchain.generateNextBlock(wallet, txPool);
+	    blockchain.generateNextBlock(wallet, txPool);
 	    //blockchain.generateNextBlockTransaction(wallet.getPublicFromWallet(), 50, wallet, txPool); //It stopped in CreateTransaction() function because it is receiving a UnspentTxOut empty
 	    //generateRawNextBlock tested into generateNextBlock()
 	    System.out.println(blockchain.getAccountBalance(wallet));
-//	    System.out.println(blockchain.getBlockchain());
+	    //System.out.println(blockchain.getBlockchain());
 //	    System.out.println(blockchain.getMyUnspentTransactionOutputs(wallet));
 //	    System.out.println(blockchain.getUnspentTxOuts());
 	    //blockchain.sendTransaction(); //Does not work because of similar motives as generateNextBlockTransaction

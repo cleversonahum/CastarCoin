@@ -42,8 +42,8 @@ public class Transaction {
     }
     
     public static Boolean validateTransaction(Transaction transaction, ArrayList<UnspentTxOut> avaliateUnspentTxOuts) {
-        if(getTransactionId(transaction).equals(transaction.id)) {
-            System.out.println("Invalid Transaction ID: "+transaction.id);
+        if(!getTransactionId(transaction).equals(transaction.id)) {
+            System.out.println("Invalid Transaction ID: "+transaction.id+"\nExpected: "+getTransactionId(transaction));
             return false;
         }
         else if(!hasValidTxIns(transaction, avaliateUnspentTxOuts)) {

@@ -12,7 +12,8 @@ public class TxPool {
     }
 
     public void addToTransactionPool(Transaction tx, ArrayList<UnspentTxOut> unspentTxOuts) {
-
+        System.out.println("tx: "+tx);
+        System.out.println("unsTxSize: "+unspentTxOuts.size());
         if (!Transaction.validateTransaction(tx, unspentTxOuts)) {
             try {
                 throw new Exception("Trying to add invalid tx to pool");

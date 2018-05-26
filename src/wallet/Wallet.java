@@ -28,13 +28,15 @@ public class Wallet {
 			if(value.address.equals(myAddress)) myUnspentTxOutsA.add(value);
 			
 		}
-
+        //System.out.println("MyUnsASize: "+myUnspentTxOutsA.size()+"\ntxPoolSize: "+txPool.size());
 		ArrayList<UnspentTxOut> myUnspentTxOuts = filterTxPoolTxs(myUnspentTxOutsA, txPool);
+		//System.out.println("MyUnpenstTxSize: "+myUnspentTxOuts.size());
 		
 		ArrayList<UnspentTxOut> includedUnspentTxOuts = findTxPoolForAmountA(amount, myUnspentTxOuts);
 		int leftOverAmount = findTxPoolForAmountB(amount, myUnspentTxOuts);
 		
 		ArrayList<TxIn> unsignedTxIns = new ArrayList<TxIn>();
+		//System.out.println("incUnsSize: "+includedUnspentTxOuts.size());
 		
 		for(UnspentTxOut value : includedUnspentTxOuts) {
 			
@@ -91,11 +93,11 @@ public class Wallet {
 		
 		for(UnspentTxOut value : myUnspentTxOutsA) {
 			
-			TxIn txin = null;
+			TxIn txin = new TxIn();
 			
 			for(TxIn aTxIn : txIns) {
 				
-				if(aTxIn.txOutIndex == value.txOutIndex && aTxIn.txOutId == value.txOutId) {
+				if(aTxIn.txOutIndex == value.txOutIndex && aTxIn.txOutId.equals(value.txOutId)) {
 					txin = aTxIn;
 					break;
 				}
@@ -115,7 +117,7 @@ public class Wallet {
 		int currentAmount = 0;
 		
 		ArrayList<UnspentTxOut> includedUnspentTxOuts = new ArrayList<UnspentTxOut>();
-		
+		//System.out.println("myUnpSize: "+myUnspentTxOuts.size());
 		for(UnspentTxOut value : myUnspentTxOuts) {
 			includedUnspentTxOuts.add(value);
 			currentAmount = currentAmount + value.amount;

@@ -13,7 +13,9 @@ public class Main {
     public static void main(String[] args) {
 	    System.out.println("Hello World!");
 	    Blockchain blockchain = new Blockchain();
-	    MC p2p = new MC('m',"224.0.0.0",3000, 80000, "P2P",blockchain);
+	    TxPool txPool = new TxPool();
+	    Wallet wallet = new Wallet();
+	    MC p2p = new MC('m',"224.0.0.0",3000, 80000, "P2P",blockchain, txPool);
 	    p2p.start();
 	    
 	    //Blockchain blockchain = new Blockchain();
@@ -23,7 +25,7 @@ public class Main {
 	    //Functions used into main.ts
 	    //From Transaction
 	    //System.out.println("1txPool: "+txPool.getTransactionPool());
-	    //blockchain.generateNextBlock(wallet, txPool);
+	    blockchain.generateNextBlock(wallet, txPool);
 	    //blockchain.generateNextBlock(wallet, txPool);
 	    //blockchain.generateNextBlock(wallet, txPool);
 	    //System.out.println("2txPool: "+txPool.getTransactionPool());

@@ -104,7 +104,7 @@ public class Blockchain {
         return generateHash(block.index, block.previousHash, block.timestamp, block.data, block.level, block.nonce);
     }
     
-    private Boolean isValidBlockStructure(Block newBlock) { //Verify if Block Variables are in accord with Block Structure
+    public Boolean isValidBlockStructure(Block newBlock) { //Verify if Block Variables are in accord with Block Structure
         return ((newBlock.index instanceof Integer) && (newBlock.hash instanceof String) && (newBlock.previousHash instanceof String) && (newBlock.timestamp instanceof Date) && (newBlock.data instanceof ArrayList) && (newBlock.level instanceof Integer) && (newBlock.nonce instanceof Integer));    
     }
     
@@ -166,7 +166,7 @@ public class Blockchain {
         return avaliateUnspentTxOuts;    
     }
     
-    private Boolean addBlockToChain(Block newBlock, TxPool txPool) {
+    public Boolean addBlockToChain(Block newBlock, TxPool txPool) {
         if(isValidNewBlock(newBlock, getLastBlock())) {
             ArrayList<UnspentTxOut> retVal = Transaction.processTransactions(newBlock.data, getUnspentTxOuts(), newBlock.index);
             if(retVal == null) {
@@ -192,7 +192,7 @@ public class Blockchain {
         return sum;
     }
     
-    private void replaceChain(ArrayList<Block> newBlocks, TxPool txPool) {
+    public void replaceChain(ArrayList<Block> newBlocks, TxPool txPool) {
         ArrayList<UnspentTxOut> avaliateUnspentTxOuts = isValidChain(newBlocks);
         Boolean validChain = (avaliateUnspentTxOuts != null);
         
@@ -341,7 +341,7 @@ public class Blockchain {
         return tx;
     }
     
-    private void handleReceivedTransaction(Transaction transaction, TxPool txPool) {
+    public void handleReceivedTransaction(Transaction transaction, TxPool txPool) {
         txPool.addToTransactionPool(transaction, getUnspentTxOuts());
     }
 

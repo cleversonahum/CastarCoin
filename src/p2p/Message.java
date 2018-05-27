@@ -22,6 +22,8 @@ public class Message{
 	else if(type.equals("RESPONSE_TRANSACTION_POOL")) {
 		this.data=cmd[1];
     	}
+    	else
+    	   this.data=null;
     	
     }
 

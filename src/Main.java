@@ -1,6 +1,7 @@
 import blockchain.*;
 import transaction.*;
 import wallet.*;
+import p2p.*;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -11,23 +12,26 @@ public class Main {
 
     public static void main(String[] args) {
 	    System.out.println("Hello World!");
-	    
 	    Blockchain blockchain = new Blockchain();
-	    TxPool txPool = new TxPool();
-	    Wallet wallet = new Wallet();
+	    MC p2p = new MC('m',"224.0.0.0",3000, 80000, "P2P",blockchain);
+	    p2p.start();
+	    
+	    //Blockchain blockchain = new Blockchain();
+	    //TxPool txPool = new TxPool();
+	    //Wallet wallet = new Wallet();
 	    
 	    //Functions used into main.ts
 	    //From Transaction
-	    System.out.println("1txPool: "+txPool.getTransactionPool());
-	    blockchain.generateNextBlock(wallet, txPool);
-	    blockchain.generateNextBlock(wallet, txPool);
-	    blockchain.generateNextBlock(wallet, txPool);
-	    System.out.println("2txPool: "+txPool.getTransactionPool());
-	    blockchain.sendTransaction(wallet.getPublicFromWallet(), 50, wallet, txPool);
-	    System.out.println("3txPool: "+txPool.getTransactionPool());
+	    //System.out.println("1txPool: "+txPool.getTransactionPool());
+	    //blockchain.generateNextBlock(wallet, txPool);
+	    //blockchain.generateNextBlock(wallet, txPool);
+	    //blockchain.generateNextBlock(wallet, txPool);
+	    //System.out.println("2txPool: "+txPool.getTransactionPool());
+	    //blockchain.sendTransaction(wallet.getPublicFromWallet(), 50, wallet, txPool);
+	    //System.out.println("3txPool: "+txPool.getTransactionPool());
 	    //blockchain.generateNextBlockTransaction(wallet.getPublicFromWallet(), 50, wallet, txPool); //It stopped in CreateTransaction() function because it is receiving a UnspentTxOut empty
 	    //generateRawNextBlock tested into generateNextBlock()
-	    System.out.println(blockchain.getAccountBalance(wallet));
+	    //System.out.println(blockchain.getAccountBalance(wallet));
 	    //System.out.println(blockchain.getBlockchain());
 //	    System.out.println(blockchain.getMyUnspentTransactionOutputs(wallet));
 //	    System.out.println(blockchain.getUnspentTxOuts());

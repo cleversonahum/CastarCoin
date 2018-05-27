@@ -162,7 +162,7 @@ public class MC extends Channel {
         
     }
     
-    private void broadcastTransactionPool(TxPool txpool) {
+    public static void broadcastTransactionPool(TxPool txPool) {
         String header = "RESPONSE_TRANSACTION_POOL\r\n\r\n";
         try{
             byte[] headerBytes = header.getBytes();
@@ -179,11 +179,28 @@ public class MC extends Channel {
         catch(Exception e){e.printStackTrace();}
     }
     
-    private void broadcastLastMsg(Blockchain blockchain) {
+    public static void broadcastLastMsg(Blockchain blockchain) {
         String header = "RESPONSE_BLOCKCHAIN\r\n\r\n";
         try{
             byte[] headerBytes = header.getBytes();
             byte[] data = serializeObject(blockchain.getLastBlock());
+                
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            outputStream.write(headerBytes);
+            outputStream.write(data);
+    		    
+            byte msg[] = outputStream.toByteArray();
+                    
+            sendMessage(msg, "224.0.0.0", 3000);
+        }
+        catch(Exception e){e.printStackTrace();}
+    }
+    
+    public static void broadcastLastMsg(Block lastBlock) {
+        String header = "RESPONSE_BLOCKCHAIN\r\n\r\n";
+        try{
+            byte[] headerBytes = header.getBytes();
+            byte[] data = serializeObject(lastBlock);
                 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             outputStream.write(headerBytes);

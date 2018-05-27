@@ -2,6 +2,7 @@ package blockchain;
 
 import transaction.*;
 import wallet.*;
+import p2p.MC;
 
 import java.math.BigInteger;
 import java.security.interfaces.RSAPublicKey;
@@ -201,7 +202,7 @@ public class Blockchain {
             this.blockchain = newBlocks;
             setUnspentTxOuts(avaliateUnspentTxOuts);
             txPool.updateTransactionPool(unspentTxOuts);
-            //FUNCTION TO BROADCAST THIS, UNDONE
+            MC.broadcastLastMsg(getLastBlock());
         }
         else
             System.out.println("Received Blockchain Invalid");
@@ -232,7 +233,6 @@ public class Blockchain {
         blockData.add(coinbaseTx);
         blockData.add(tx);
         return generateRawNextBlock(blockData, txPool);
-        //UNDONE
     }
 
     public void printBlockchain(ArrayList<Block> blocks) {  //Print the blockchain (LOGS)
@@ -318,7 +318,7 @@ public class Blockchain {
         Date nextTimestamp = getCurrentTimestamp();
         Block newBlock = findBlock(nextIndex, previousBlock.hash, nextTimestamp, blockData, level);
         if(addBlockToChain(newBlock, txPool)) {
-            //BROADCAST FUNCTION UNDONE
+            MC.broadcastLastMsg(getLastBlock());
             return newBlock;
         }
         else
@@ -336,7 +336,7 @@ public class Blockchain {
     public Transaction sendTransaction(PublicKey address, int amount, Wallet wallet, TxPool txPool) {
         Transaction tx = wallet.createTransaction(address, amount, wallet.getPrivateFromWallet(), getUnspentTxOuts(), txPool.getTransactionPool());
         txPool.addToTransactionPool(tx, getUnspentTxOuts());
-        //BROADCAST UNDONE
+        MC.broadcastTransactionPool(txPool);
         
         return tx;
     }

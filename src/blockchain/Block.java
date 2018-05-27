@@ -2,9 +2,14 @@ package blockchain;
 
 import transaction.Transaction;
 import java.util.Date;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Block {
+public class Block implements Serializable {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3466731937657416478L;
     public Integer index;
     public String hash;
     public String previousHash;

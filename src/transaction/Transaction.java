@@ -10,12 +10,16 @@ import java.security.KeyFactory;
 import java.security.Signature;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
-
+import java.io.Serializable;
 import java.math.BigInteger;
 
 import java.nio.charset.StandardCharsets;
 
-public class Transaction {
+public class Transaction implements Serializable {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3458720829122192965L;
     public String id = "";
     public ArrayList<TxIn> txIns = new ArrayList<>();
     public ArrayList<TxOut> txOuts = new ArrayList<>();

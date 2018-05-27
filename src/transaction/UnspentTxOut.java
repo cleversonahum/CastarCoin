@@ -17,6 +17,9 @@ public class UnspentTxOut {
     
     @Override
     public String toString(){
-        return "txOutId: " + txOutId + " txOutIndex: " + txOutIndex + " address: " + address + " amount: " + amount;
+        return "TxOutId:\n" + this.txOutId +
+                "\nTxOutIndex:\n" + this.txOutIndex +
+                "\nAddress:\n" + this.address +
+                "\nAmount:\n" + this.amount;
     }
 }

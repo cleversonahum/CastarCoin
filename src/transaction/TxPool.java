@@ -111,4 +111,14 @@ public class TxPool {
             }
         }
     }
+
+    @Override
+    public String toString(){
+        StringBuilder out = new StringBuilder();
+        System.out.println("Transactions in pool.");
+        for (Transaction tx :this.txPool) {
+            out.append(tx.toString());
+        }
+        return out.toString();
+    }
 }

@@ -15,4 +15,10 @@ public class TxOut implements Serializable  {
         this.address = address;
         this.amount = amount;
     }
+
+    @Override
+    public String toString(){
+        return "Address: " + this.address +
+                "\nAmount:\n" + this.amount;
+    }
 }

@@ -372,4 +372,11 @@ public class Transaction implements Serializable {
         byte[] encodedPublicKey = publicKey.getEncoded();
         return Base64.getEncoder().encodeToString(encodedPublicKey);
     }
+
+    @Override
+    public String toString(){
+        return "Transaction ID: " + this.id +
+                "\nTransactions In:\n" + this.txIns.toString() +
+                "\nTransactions Out:\n" + this.txOuts.toString();
+    }
 }

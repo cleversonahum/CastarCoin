@@ -33,6 +33,7 @@ public class MC extends Channel {
 			queryAll(M, this.blockchain);
 		}
 		else if(M.getType().equals("RESPONSE_BLOCKCHAIN")) {
+		    System.out.println("Calling Response Block Chain");
 			responseBlockchain(M, this.blockchain, this.txPool);
 		}
 		else if(M.getType().equals("QUERY_TRANSACTION_POOL")) {
@@ -190,7 +191,6 @@ public class MC extends Channel {
             outputStream.write(data);
     		    
             byte msg[] = outputStream.toByteArray();
-                    
             sendMessage(msg, "224.0.0.0", 3000);
         }
         catch(Exception e){e.printStackTrace();}
@@ -207,7 +207,7 @@ public class MC extends Channel {
             outputStream.write(data);
     		    
             byte msg[] = outputStream.toByteArray();
-                    
+            System.out.println("Broadcasting Last Block");
             sendMessage(msg, "224.0.0.0", 3000);
         }
         catch(Exception e){e.printStackTrace();}

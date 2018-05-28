@@ -42,6 +42,8 @@ public class MC extends Channel {
 		else if(M.getType().equals("RESPONSE_TRANSACTION_POOL")) {
 			responseTransactionPool(M, this.blockchain, this.txPool);
 		}
+		
+		
 	}
 	
 	private void queryLatest(Message M, Blockchain blockchain) {
@@ -80,7 +82,9 @@ public class MC extends Channel {
 	
 	private void responseBlockchain(Message M, Blockchain blockchain, TxPool txPool) {
 	    try {
-            ArrayList<Block> receivedBlocks = (ArrayList<Block>)deserializeBytes(M.getData().getBytes());
+            Block receivedBlock = (Block)deserializeBytes(M.getBody());
+            ArrayList<Block> receivedBlocks = new ArrayList<Block>();
+            receivedBlocks.add(receivedBlock);
             if(receivedBlocks.size()==0) {
                 System.out.println("Invalid blocks received");
             }
@@ -110,14 +114,15 @@ public class MC extends Channel {
     
     private Boolean responseTransactionPool(Message M, Blockchain blockchain, TxPool txPool) {
         try {
-            ArrayList<Transaction> receivedTransactions = (ArrayList<Transaction>)deserializeBytes(M.getData().getBytes());
+            ArrayList<Transaction> receivedTransactions = (ArrayList<Transaction>)deserializeBytes(M.getBody());
+                        System.out.println("TAMANHO: "+receivedTransactions.size());
             if(receivedTransactions.size()==0 || receivedTransactions==null) {
 	           System.out.println("Invalid transaction received");
 	           return false;
             }
             for(Transaction tx:receivedTransactions) {
                 blockchain.handleReceivedTransaction(tx, txPool);
-                broadcastTransactionPool(txPool);
+                //broadcastTransactionPool(txPool);
             }
             return true;
         }
@@ -143,7 +148,7 @@ public class MC extends Channel {
             if(lastBlockHeld.hash.equals(lastBlockReceived.previousHash)) {
                 if(blockchain.addBlockToChain(lastBlockReceived, txPool)) {
                     
-                    broadcastLastMsg(blockchain);
+                    broadcastLastMsg(blockchain.getBlockchain());
                 }
             }
             else if(receivedBlocks.size() == 1) {
@@ -180,34 +185,17 @@ public class MC extends Channel {
         catch(Exception e){e.printStackTrace();}
     }
     
-    public static void broadcastLastMsg(Blockchain blockchain) {
+    public static void broadcastLastMsg(ArrayList<Block> blockchain) {
         String header = "RESPONSE_BLOCKCHAIN\r\n\r\n";
         try{
             byte[] headerBytes = header.getBytes();
-            byte[] data = serializeObject(blockchain.getLastBlock());
+            byte[] data = serializeObject(blockchain.get(blockchain.size()-1));
                 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             outputStream.write(headerBytes);
             outputStream.write(data);
     		    
             byte msg[] = outputStream.toByteArray();
-            sendMessage(msg, "224.0.0.0", 3000);
-        }
-        catch(Exception e){e.printStackTrace();}
-    }
-    
-    public static void broadcastLastMsg(Block lastBlock) {
-        String header = "RESPONSE_BLOCKCHAIN\r\n\r\n";
-        try{
-            byte[] headerBytes = header.getBytes();
-            byte[] data = serializeObject(lastBlock);
-                
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            outputStream.write(headerBytes);
-            outputStream.write(data);
-    		    
-            byte msg[] = outputStream.toByteArray();
-            System.out.println("Broadcasting Last Block");
             sendMessage(msg, "224.0.0.0", 3000);
         }
         catch(Exception e){e.printStackTrace();}

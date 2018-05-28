@@ -202,7 +202,7 @@ public class Blockchain {
             this.blockchain = newBlocks;
             setUnspentTxOuts(avaliateUnspentTxOuts);
             txPool.updateTransactionPool(unspentTxOuts);
-            MC.broadcastLastMsg(getLastBlock());
+            MC.broadcastLastMsg(getBlockchain());
         }
         else
             System.out.println("Received Blockchain Invalid");
@@ -318,7 +318,7 @@ public class Blockchain {
         Date nextTimestamp = getCurrentTimestamp();
         Block newBlock = findBlock(nextIndex, previousBlock.hash, nextTimestamp, blockData, level);
         if(addBlockToChain(newBlock, txPool)) {
-            MC.broadcastLastMsg(getLastBlock());
+            MC.broadcastLastMsg(getBlockchain());
             return newBlock;
         }
         else

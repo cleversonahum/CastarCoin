@@ -16,7 +16,8 @@ public class TxPool {
         System.out.println("unsTxSize: "+unspentTxOuts.size());
         if (!Transaction.validateTransaction(tx, unspentTxOuts)) {
             try {
-                throw new Exception("Trying to add invalid tx to pool");
+                //throw new Exception("Trying to add invalid tx to pool");
+                System.out.println("Trying to add invalid tx to pool");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -24,7 +25,8 @@ public class TxPool {
 
         if (!isValidTxForPool(tx, this.txPool)) {
             try {
-                throw new Exception("Trying to add invalid tx to pool");
+                //throw new Exception("Trying to add invalid tx to pool");
+                System.out.println("Trying to add invalid tx to pool");
             } catch (Exception e) {
                 e.printStackTrace();
             }

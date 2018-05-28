@@ -27,4 +27,11 @@ public class Block implements Serializable {
         this.level = level;
         this.nonce = nonce;
     }
+	
+	public String printString() {
+		// TODO Auto-generated method stub
+		return "Index: " + this.index + "\n" + "Hash: " + this.hash + "\n" + "Previous Hash: " +this.previousHash+ "\n" 
+				+ "Timestamp: " +this.timestamp+ "\n" + "Difficulty: " + this.level+ "\n" +"Nonce: " +this.nonce+ "\n"; 
+		
+	}
 }

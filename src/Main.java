@@ -19,7 +19,7 @@ public class Main {
 //	    MC p2p = new MC('m',"224.0.0.0",3000, 80000, "P2P",blockchain, txPool);
 //	    p2p.start();
 	    
-	    System.out.println("Castar-Coin");
+	     System.out.println("Castar-Coin");
          Scanner input = new Scanner(System.in);      
         int selection = -1;
         do {
@@ -27,31 +27,55 @@ public class Main {
                 System.out.println("1- View Current Balance");
                 System.out.println("2- View Public Adress");
                 System.out.println("3- Mine Block");
-                System.out.println("4- Do a transaction");
+                System.out.println("4- View Blockchain");
+                System.out.println("5- View Block");
+                System.out.println("6- Do transaction");
                 System.out.println("0- Leave");
                 //mais cenas
                
-            System.out.println("Enter an option  : ");
+            System.out.print("Enter an option  : ");
             
             selection = input.nextInt();
             
                
             switch(selection) {
            
+            case 0:
+                break;
             case 1:
-                    //View Current Balance
-                    break;
+            		System.out.print("Your current balance is: ");
+            		System.out.println(blockchain.getAccountBalance(wallet));
+                break;
             case 2:
-                    //View Public Adress
-                    break;
+            		System.out.println("Your public address is: ");
+            		System.out.println(wallet.getPublicFromWallet());
+            		break;
             case 3:
-                    //Mine Block
-                    break;
+            		System.out.println("A new block was mined!");
+            		blockchain.generateNextBlock(wallet, txPool);
+                 break;
             case 4:
-                    //Do a transaction
-                    break;
-                default:
-                    System.out.println("The selection is invalid!");
+            		System.out.println(blockchain.getBlockchain());
+                break;
+            case 5:
+                 System.out.print("Pick a block from the blockChain");
+                 int a=input.nextInt();
+                 Block b=blockchain.getBlockchain().get(0);
+                 System.out.println(b.printString());
+                 break;
+            case 6:
+            		System.out.println("Chose the receiver address:");
+               // String address=input.nextLine();
+                System.out.print("Chose the amount:");
+                int amount=input.nextInt();
+                blockchain.sendTransaction(wallet.getPublicFromWallet(), amount, wallet, txPool);
+                System.out.println("Transaction completed");
+                break;
+            
+            default:
+                System.out.println("The selection is invalid!");
+                    
+               
             }
            //input.close();
         }while (selection!=0);

@@ -13,11 +13,11 @@ public class Main {
 
     public static void main(String[] args) {
 	    System.out.println("Hello World!");
-//	    Blockchain blockchain = new Blockchain();
-//	    TxPool txPool = new TxPool();
-//	    Wallet wallet = new Wallet();
-//	    MC p2p = new MC('m',"224.0.0.0",3000, 80000, "P2P",blockchain, txPool);
-//	    p2p.start();
+	    Blockchain blockchain = new Blockchain();
+	    TxPool txPool = new TxPool();
+	    Wallet wallet = new Wallet();
+	    MC p2p = new MC('m',"224.0.0.0",3000, 80000, "P2P",blockchain, txPool);
+	    p2p.start();
 	    
 	     System.out.println("Castar-Coin");
          Scanner input = new Scanner(System.in);      

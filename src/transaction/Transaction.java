@@ -193,6 +193,7 @@ public class Transaction implements Serializable {
             return false;
         }
         else if(transaction.txOuts.get(0).amount != COINBASE_AMOUNT) {
+            
             System.out.println("Invalid coinbase amount in coinbase transaction");
             return false;
         }

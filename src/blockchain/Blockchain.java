@@ -19,7 +19,8 @@ import java.lang.Math;
 
 public class Blockchain {
     
-    public Blockchain() {
+    public Blockchain(ArrayList<String> peers) {
+        this.peers = peers;
         //Init Genesis Transaction
         TxIn genesisTxIn = new TxIn();
         genesisTxIn.txOutId = "";
@@ -54,6 +55,8 @@ public class Blockchain {
     private final int BLOCK_GENERATION_INTERVAL = 10;
     private final int LEVEL_ADJUSTMENT_INTERVAL = 10;
     private final int TIMESTAMP_VALIDATION = 60000;
+    
+    private ArrayList<String> peers = new ArrayList<>();
     
     final public Transaction genesisTransaction = new Transaction(); //Initiated in constructor
     
@@ -175,7 +178,9 @@ public class Blockchain {
                 return false;
             }
             else {
+                System.out.println("PAST BLOCKCHAIN: "+this.blockchain);
                 this.blockchain.add(newBlock);
+                System.out.println("NEW BLOCKCHAIN: "+this.blockchain);
                 setUnspentTxOuts(retVal);
                 txPool.updateTransactionPool(this.unspentTxOuts);
                 return true;
@@ -202,7 +207,7 @@ public class Blockchain {
             this.blockchain = newBlocks;
             setUnspentTxOuts(avaliateUnspentTxOuts);
             txPool.updateTransactionPool(unspentTxOuts);
-            MC.broadcastLastMsg(getBlockchain());
+            MC.broadcastLastMsg(getBlockchain(), this.peers);
         }
         else
             System.out.println("Received Blockchain Invalid");
@@ -318,7 +323,8 @@ public class Blockchain {
         Date nextTimestamp = getCurrentTimestamp();
         Block newBlock = findBlock(nextIndex, previousBlock.hash, nextTimestamp, blockData, level);
         if(addBlockToChain(newBlock, txPool)) {
-            MC.broadcastLastMsg(getBlockchain());
+            System.out.println("Coinbase saindo é: "+newBlock.data.get(0).txOuts.get(0).amount);
+            MC.broadcastLastMsg(getBlockchain(), this.peers);
             return newBlock;
         }
         else
@@ -336,7 +342,7 @@ public class Blockchain {
     public Transaction sendTransaction(PublicKey address, int amount, Wallet wallet, TxPool txPool) {
         Transaction tx = wallet.createTransaction(address, amount, wallet.getPrivateFromWallet(), getUnspentTxOuts(), txPool.getTransactionPool());
         txPool.addToTransactionPool(tx, getUnspentTxOuts());
-        MC.broadcastTransactionPool(txPool);
+        MC.broadcastTransactionPool(txPool, this.peers);
         
         return tx;
     }

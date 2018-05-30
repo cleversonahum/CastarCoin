@@ -192,8 +192,8 @@ public class Transaction implements Serializable {
             System.out.println("Invalid number of txOuts in coinbase transaction");
             return false;
         }
-        else if(transaction.txOuts.get(0).amount != COINBASE_AMOUNT) {
-            
+        else if(!transaction.txOuts.get(0).amount.equals(COINBASE_AMOUNT)) {
+            System.out.println("COINBASE HERE: "+transaction.txOuts.get(0).amount+" TYPE "+transaction.txOuts.get(0).amount.getClass().getName()+"\nEXPECTED: "+COINBASE_AMOUNT+" TYPE "+COINBASE_AMOUNT.getClass().getName());
             System.out.println("Invalid coinbase amount in coinbase transaction");
             return false;
         }
@@ -374,10 +374,10 @@ public class Transaction implements Serializable {
         return Base64.getEncoder().encodeToString(encodedPublicKey);
     }
 
-    @Override
-    public String toString(){
-        return "Transaction ID: " + this.id +
-                "\nTransactions In:\n" + this.txIns.toString() +
-                "\nTransactions Out:\n" + this.txOuts.toString();
-    }
+//    @Override
+//    public String toString(){
+//        return "Transaction ID: " + this.id +
+//                "\nTransactions In:\n" + this.txIns.toString() +
+//                "\nTransactions Out:\n" + this.txOuts.toString();
+//    }
 }

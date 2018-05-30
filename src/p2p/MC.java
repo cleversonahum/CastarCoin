@@ -14,39 +14,45 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 public class MC extends Channel {
-	public MC(char type, String address, int port, int packetS, String name, Blockchain blockchain, TxPool txPool) {
+	public MC(char type, String address, int port, int packetS, String name, Blockchain blockchain, TxPool txPool, ArrayList<String> peers) {
 		super(type, address, port, packetS, name);
 		this.blockchain = blockchain;
 		this.txPool = txPool;
+		this.peers = peers;
 	}
 	
+	private final static int PORT = 3000;
 	private Blockchain blockchain;
 	private TxPool txPool;
+	private ArrayList<String> peers = new ArrayList<>();
 
 	public void select (DatagramPacket dPacket) {
+	    
+	    //Selecting Message
 		Message M=new Message(dPacket);
 		
 		if(M.getType().equals("QUERY_LATEST")) {
-            queryLatest(M,this.blockchain);
+            queryLatest(dPacket.getAddress().getHostAddress(),dPacket.getPort(), M,this.blockchain);
 		}
 		else if(M.getType().equals("QUERY_ALL")) {
-			queryAll(M, this.blockchain);
+			queryAll(dPacket.getAddress().getHostAddress(),dPacket.getPort(), M, this.blockchain);
 		}
 		else if(M.getType().equals("RESPONSE_BLOCKCHAIN")) {
-		    System.out.println("Calling Response Block Chain");
 			responseBlockchain(M, this.blockchain, this.txPool);
 		}
 		else if(M.getType().equals("QUERY_TRANSACTION_POOL")) {
-			queryTransactionPool(M,this.txPool);
+			queryTransactionPool(dPacket.getAddress().getHostAddress(),dPacket.getPort(), M,this.txPool);
 		}
 		else if(M.getType().equals("RESPONSE_TRANSACTION_POOL")) {
 			responseTransactionPool(M, this.blockchain, this.txPool);
 		}
-		
-		
+		//System.out.println("ENDEREÇO: "+dPacket.getAddress().getHostAddress());
+		sendMessage(("QUERY_LATEST").getBytes(),dPacket.getAddress().getHostAddress(),dPacket.getPort());
+		try{Thread.sleep(500);}catch(Exception e){e.printStackTrace();}
+		broadcastTransactionPool(txPool, this.peers);
 	}
 	
-	private void queryLatest(Message M, Blockchain blockchain) {
+	private void queryLatest(String address, int port, Message M, Blockchain blockchain) {
 	     String header = "RESPONSE_BLOCKCHAIN\r\n\r\n";
 		    try{
                 byte[] headerBytes = header.getBytes();
@@ -57,13 +63,12 @@ public class MC extends Channel {
       		    outputStream.write(data);
 		    
                 byte msg[] = outputStream.toByteArray();
-                
-                sendMessage(msg, "224.0.0.0", 3000);
+                sendMessage(msg, address, port);
 	       }
 	       catch(Exception e){e.printStackTrace();}
 	}
 	
-	private void queryAll(Message M, Blockchain blockchain) {
+	private void queryAll(String address, int port, Message M, Blockchain blockchain) {
         String header = "RESPONSE_BLOCKCHAIN\r\n\r\n";
         try{
             byte[] headerBytes = header.getBytes();
@@ -75,7 +80,7 @@ public class MC extends Channel {
 		    
             byte msg[] = outputStream.toByteArray();
                 
-            sendMessage(msg, "224.0.0.0", 3000);
+            sendMessage(msg, address, port);
         }
         catch(Exception e){e.printStackTrace();}
 	}
@@ -95,7 +100,7 @@ public class MC extends Channel {
 
 	}
 	
-    private void queryTransactionPool(Message M, TxPool txPool) {
+    private void queryTransactionPool(String address, int port, Message M, TxPool txPool) {
 	        String header = "RESPONSE_TRANSACTION_POOL\r\n\r\n";
             try{
                 byte[] headerBytes = header.getBytes();
@@ -107,7 +112,7 @@ public class MC extends Channel {
     		    
                 byte msg[] = outputStream.toByteArray();
                     
-                sendMessage(msg, "224.0.0.0", 3000);
+                sendMessage(msg, address, port);
             }
             catch(Exception e){e.printStackTrace();}
     }
@@ -115,14 +120,13 @@ public class MC extends Channel {
     private Boolean responseTransactionPool(Message M, Blockchain blockchain, TxPool txPool) {
         try {
             ArrayList<Transaction> receivedTransactions = (ArrayList<Transaction>)deserializeBytes(M.getBody());
-                        System.out.println("TAMANHO: "+receivedTransactions.size());
             if(receivedTransactions.size()==0 || receivedTransactions==null) {
-	           System.out.println("Invalid transaction received");
+	           //System.out.println("Invalid transaction received");
 	           return false;
             }
             for(Transaction tx:receivedTransactions) {
                 blockchain.handleReceivedTransaction(tx, txPool);
-                //broadcastTransactionPool(txPool);
+                broadcastTransactionPool(txPool, this.peers);
             }
             return true;
         }
@@ -148,7 +152,7 @@ public class MC extends Channel {
             if(lastBlockHeld.hash.equals(lastBlockReceived.previousHash)) {
                 if(blockchain.addBlockToChain(lastBlockReceived, txPool)) {
                     
-                    broadcastLastMsg(blockchain.getBlockchain());
+                    broadcastLastMsg(blockchain.getBlockchain(), this.peers);
                 }
             }
             else if(receivedBlocks.size() == 1) {
@@ -168,7 +172,7 @@ public class MC extends Channel {
         
     }
     
-    public static void broadcastTransactionPool(TxPool txPool) {
+    public static void broadcastTransactionPool(TxPool txPool, ArrayList<String> peers) {
         String header = "RESPONSE_TRANSACTION_POOL\r\n\r\n";
         try{
             byte[] headerBytes = header.getBytes();
@@ -179,13 +183,16 @@ public class MC extends Channel {
             outputStream.write(data);
     		    
             byte msg[] = outputStream.toByteArray();
-                    
-            sendMessage(msg, "224.0.0.0", 3000);
+            
+            for(String peer : peers) {
+                sendMessage(msg, peer, PORT);
+            }
+
         }
         catch(Exception e){e.printStackTrace();}
     }
     
-    public static void broadcastLastMsg(ArrayList<Block> blockchain) {
+    public static void broadcastLastMsg(ArrayList<Block> blockchain, ArrayList<String> peers) {
         String header = "RESPONSE_BLOCKCHAIN\r\n\r\n";
         try{
             byte[] headerBytes = header.getBytes();
@@ -196,7 +203,10 @@ public class MC extends Channel {
             outputStream.write(data);
     		    
             byte msg[] = outputStream.toByteArray();
-            sendMessage(msg, "224.0.0.0", 3000);
+            
+            for(String peer : peers)
+                sendMessage(msg, peer, PORT);
+
         }
         catch(Exception e){e.printStackTrace();}
     }
@@ -211,7 +221,8 @@ public class MC extends Channel {
     		    
             byte msg[] = outputStream.toByteArray();
                     
-            sendMessage(msg, "224.0.0.0", 3000);
+            for(String peer : peers)
+                sendMessage(msg, peer, PORT);
         }
         catch(Exception e){e.printStackTrace();}
     }
@@ -237,5 +248,12 @@ public class MC extends Channel {
     
         return bytes;
     }
-
+    
+    public void connectPeers(String address) {
+        this.peers.add(address);
+    }
+    
+    public ArrayList<String> getPeers() {
+        return this.peers;
+    }
 }

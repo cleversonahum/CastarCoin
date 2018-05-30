@@ -8,9 +8,9 @@ public class Channel extends Thread {
     static DatagramSocket server;
     private String threadName;
     private int packetSize;
-    private int portNumber;
+    public int portNumber;
     private char serverType; //"m" to multicast and "u" to unicast
-    private String address;
+    public String address;
    
     public Channel (char type, String addr, int port, int packetS, String name) {
         threadName = name;

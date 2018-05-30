@@ -13,10 +13,12 @@ public class Main {
 
     public static void main(String[] args) {
 	    System.out.println("Hello World!");
-	    Blockchain blockchain = new Blockchain();
+	    ArrayList<String> peers = new ArrayList<>();
+	    peers.add("172.21.0.3");
+	    Blockchain blockchain = new Blockchain(peers);
 	    TxPool txPool = new TxPool();
 	    Wallet wallet = new Wallet();
-	    MC p2p = new MC('m',"224.0.0.0",3000, 80000, "P2P",blockchain, txPool);
+	    MC p2p = new MC('u',"172.21.0.2",3000, 80000, "P2P",blockchain, txPool, peers);
 	    p2p.start();
 	    
 	     System.out.println("Castar-Coin");
@@ -30,6 +32,7 @@ public class Main {
                 System.out.println("4- View Blockchain");
                 System.out.println("5- View Block");
                 System.out.println("6- Do transaction");
+                System.out.println("7- View Transaction Pool");
                 System.out.println("0- Leave");
                 //mais cenas
                
@@ -60,16 +63,21 @@ public class Main {
             case 5:
                  System.out.print("Pick a block from the blockChain");
                  int a=input.nextInt();
-                 Block b=blockchain.getBlockchain().get(0);
+                 Block b=blockchain.getBlockchain().get(a);
                  System.out.println(b.printString());
                  break;
             case 6:
-            		System.out.println("Chose the receiver address:");
-               // String address=input.nextLine();
-                System.out.print("Chose the amount:");
+            		//System.out.println("Chose the receiver address:");
+               //String address=input.nextLine();
+                System.out.print("Choose the amount:");
                 int amount=input.nextInt();
                 blockchain.sendTransaction(wallet.getPublicFromWallet(), amount, wallet, txPool);
                 System.out.println("Transaction completed");
+                break;
+            
+            case 7:
+                System.out.println("Transation Pool: ");
+                System.out.println(txPool.getTransactionPool());
                 break;
             
             default:
@@ -87,14 +95,14 @@ public class Main {
 	    
 	    //Functions used into main.ts
 	    //From Transaction
-	    //System.out.println("1txPool: "+txPool.getTransactionPool());
-	    //blockchain.generateNextBlock(wallet, txPool);
+//	    System.out.println("1txPool: "+txPool.getTransactionPool());
 //	    blockchain.generateNextBlock(wallet, txPool);
 //	    blockchain.generateNextBlock(wallet, txPool);
-	    //System.out.println("2txPool: "+txPool.getTransactionPool());
-	    //blockchain.sendTransaction(wallet.getPublicFromWallet(), 50, wallet, txPool);
-	    //blockchain.sendTransaction(wallet.getPublicFromWallet(), 50, wallet, txPool);
-	    //System.out.println("3txPool: "+txPool.getTransactionPool());
+//	    blockchain.generateNextBlock(wallet, txPool);
+//	    System.out.println("2txPool: "+txPool.getTransactionPool());
+//	    blockchain.sendTransaction(wallet.getPublicFromWallet(), 50, wallet, txPool);
+//	    blockchain.sendTransaction(wallet.getPublicFromWallet(), 50, wallet, txPool);
+//	    System.out.println("3txPool: "+txPool.getTransactionPool());
 	    //blockchain.generateNextBlockTransaction(wallet.getPublicFromWallet(), 50, wallet, txPool); //It stopped in CreateTransaction() function because it is receiving a UnspentTxOut empty
 	    //generateRawNextBlock tested into generateNextBlock()
 	    //System.out.println(blockchain.getAccountBalance(wallet));
@@ -106,49 +114,5 @@ public class Main {
 	    //From TxPool
 	    //System.out.println(txPool.getTransactionPool());
 	    
-        
-        //Functions used into p2p.ts
-        //System.out.println(blockchain.getLastBlock());
-        //addBlockToChain needs to be tested
-        //handleReceivedTransaction needs to be tested
-        
-		// Needs real keys
-		// To be removed
-		/*wallet.createTransaction(new PublicKey() {
-									@Override
-									public String getAlgorithm() {
-										return null;
-									}
-
-									@Override
-									public String getFormat() {
-										return null;
-									}
-
-									@Override
-									public byte[] getEncoded() {
-										return new byte[0];
-									}
-								},
-								10,
-								new PrivateKey() {
-									@Override
-									public String getAlgorithm() {
-										return null;
-									}
-
-									@Override
-									public String getFormat() {
-										return null;
-									}
-
-									@Override
-									public byte[] getEncoded() {
-										return new byte[0];
-									}
-								},
-								new ArrayList<UnspentTxOut>(),
-								new ArrayList<Transaction>()
-		);*/
 	}
 }

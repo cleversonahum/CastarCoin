@@ -46,7 +46,7 @@ public class MC extends Channel {
 		else if(M.getType().equals("RESPONSE_TRANSACTION_POOL")) {
 			responseTransactionPool(M, this.blockchain, this.txPool);
 		}
-		//System.out.println("ENDEREÇO: "+dPacket.getAddress().getHostAddress());
+		System.out.println("ENDEREÇO: "+dPacket.getAddress().getHostAddress());
 		sendMessage(("QUERY_LATEST").getBytes(),dPacket.getAddress().getHostAddress(),dPacket.getPort());
 		try{Thread.sleep(500);}catch(Exception e){e.printStackTrace();}
 		broadcastTransactionPool(txPool, this.peers);
@@ -151,7 +151,6 @@ public class MC extends Channel {
             System.out.println("Blockchain possibly behind.\nReceived Index: "+lastBlockReceived.index+"\nPeer has: "+lastBlockHeld.index);
             if(lastBlockHeld.hash.equals(lastBlockReceived.previousHash)) {
                 if(blockchain.addBlockToChain(lastBlockReceived, txPool)) {
-                    
                     broadcastLastMsg(blockchain.getBlockchain(), this.peers);
                 }
             }

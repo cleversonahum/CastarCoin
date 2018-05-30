@@ -14,7 +14,7 @@ import transaction.*;
 public class Wallet {
 
 	
-	private static final String PRIVATE_KEY_LOCATION = "./src/keystore.jks";
+	private static final String PRIVATE_KEY_LOCATION = "./keystore.jks";
 	
 	public Transaction createTransaction(PublicKey receiverAddress, int amount, PrivateKey privateKey, ArrayList<UnspentTxOut> unspentTxOuts,
 			ArrayList<Transaction> txPool) {

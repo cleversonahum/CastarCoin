@@ -105,6 +105,7 @@ public class Blockchain {
 //    CryptoJS.SHA256(index + previousHash + timestamp + data + difficulty + nonce).toString();
     
     private String generateHashBlock(Block block) { //Generate Hash to a Block made
+//        System.out.println("BLOCK INFO: \nIndex: "+block.index+"\nPreviousHash: "+block.previousHash+"\nTimestamp: "+block.timestamp+"\nblockData: ")
         return generateHash(block.index, block.previousHash, block.timestamp, block.data, block.level, block.nonce);
     }
     
@@ -305,7 +306,7 @@ public class Blockchain {
     
     private Boolean hasValidHash(Block block) {
         if(!hashMatchBlockContent(block)) {
-            System.out.println("Invalid Hash: " + block.hash);
+            System.out.println("Invalid Hash: " + block.hash+"\nExpected: "+generateHashBlock(block));
             return false;
         }
         else if(!hashMatchLevel(block.hash, block.level)) {

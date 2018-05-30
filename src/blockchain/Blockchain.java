@@ -324,7 +324,7 @@ public class Blockchain {
         Date nextTimestamp = getCurrentTimestamp();
         Block newBlock = findBlock(nextIndex, previousBlock.hash, nextTimestamp, blockData, level);
         if(addBlockToChain(newBlock, txPool)) {
-            System.out.println("Coinbase saindo é: "+newBlock.data.get(0).txOuts.get(0).amount);
+            //System.out.println("Coinbase saindo é: "+newBlock.data.get(0).txOuts.get(0).amount);
             MC.broadcastLastMsg(getBlockchain(), this.peers);
             return newBlock;
         }

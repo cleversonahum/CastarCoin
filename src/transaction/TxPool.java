@@ -26,7 +26,7 @@ public class TxPool {
         if (!isValidTxForPool(tx, this.txPool)) {
             try {
                 //throw new Exception("Trying to add invalid tx to pool");
-                System.out.println("Trying to add invalid tx to pool");
+                //System.out.println("Trying to add invalid tx to pool");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -66,7 +66,7 @@ public class TxPool {
 
         for (TxIn txIn : tx.txIns) {
             if (containsTxIn(txPoolIns, txIn)) {
-                System.out.println("txIn already found in the txPool");
+                //System.out.println("txIn already found in the txPool");
                 return false;
             }
         }

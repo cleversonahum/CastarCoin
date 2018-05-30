@@ -179,9 +179,9 @@ public class Blockchain {
                 return false;
             }
             else {
-                System.out.println("PAST BLOCKCHAIN: "+this.blockchain);
+                //System.out.println("PAST BLOCKCHAIN: "+this.blockchain);
                 this.blockchain.add(newBlock);
-                System.out.println("NEW BLOCKCHAIN: "+this.blockchain);
+                //System.out.println("NEW BLOCKCHAIN: "+this.blockchain);
                 setUnspentTxOuts(retVal);
                 txPool.updateTransactionPool(this.unspentTxOuts);
                 return true;

@@ -12,12 +12,12 @@ public class TxPool {
     }
 
     public void addToTransactionPool(Transaction tx, ArrayList<UnspentTxOut> unspentTxOuts) {
-        System.out.println("tx: "+tx);
-        System.out.println("unsTxSize: "+unspentTxOuts.size());
+        //System.out.println("tx: "+tx);
+        //System.out.println("unsTxSize: "+unspentTxOuts.size());
         if (!Transaction.validateTransaction(tx, unspentTxOuts)) {
             try {
                 //throw new Exception("Trying to add invalid tx to pool");
-                System.out.println("Trying to add invalid tx to pool");
+                //System.out.println("Trying to add invalid tx to pool");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -32,7 +32,7 @@ public class TxPool {
             }
         }
 
-        System.out.println("Adding to txPool: " + tx.toString());
+        //System.out.println("Adding to txPool: " + tx.toString());
         this.txPool.add(tx);
     }
 
@@ -75,7 +75,7 @@ public class TxPool {
 
     private boolean hasTxIn(TxIn txIn, ArrayList<UnspentTxOut> unspentTxOuts) {
         for (UnspentTxOut to : unspentTxOuts) {
-            System.out.println("Received_OutIndex: "+to.txOutIndex+"\nExpected: "+txIn.txOutIndex+"\nReceived_OutId: "+to.txOutId+"\nExpected: "+txIn.txOutId);
+            //System.out.println("Received_OutIndex: "+to.txOutIndex+"\nExpected: "+txIn.txOutIndex+"\nReceived_OutId: "+to.txOutId+"\nExpected: "+txIn.txOutId);
             if((to.txOutIndex == txIn.txOutIndex) && (to.txOutId.equals(txIn.txOutId))){
                 return true;
             }

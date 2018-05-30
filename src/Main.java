@@ -47,14 +47,14 @@ public class Main {
                 break;
             case 1:
             		System.out.print("Your current balance is: ");
-            		System.out.println(blockchain.getAccountBalance(wallet));
+            		System.out.println(blockchain.getAccountBalance(wallet)+"\n\n");
                 break;
             case 2:
             		System.out.println("Your public address is: ");
-            		System.out.println(wallet.getPublicFromWallet());
+            		System.out.println(wallet.getPublicFromWallet()+"\n\n");
             		break;
             case 3:
-            		System.out.println("A new block was mined!");
+            		System.out.println("A new block was mined!\n\n");
             		blockchain.generateNextBlock(wallet, txPool);
                  break;
             case 4:
@@ -64,7 +64,7 @@ public class Main {
                  System.out.print("Pick a block from the blockChain");
                  int a=input.nextInt();
                  Block b=blockchain.getBlockchain().get(a);
-                 System.out.println(b.printString());
+                 System.out.println(b.printString()+"\n\n");
                  break;
             case 6:
             		//System.out.println("Chose the receiver address:");
@@ -72,16 +72,16 @@ public class Main {
                 System.out.print("Choose the amount:");
                 int amount=input.nextInt();
                 blockchain.sendTransaction(wallet.getPublicFromWallet(), amount, wallet, txPool);
-                System.out.println("Transaction completed");
+                System.out.println("Transaction completed\n\n");
                 break;
             
             case 7:
                 System.out.println("Transation Pool: ");
-                System.out.println(txPool.getTransactionPool());
+                System.out.println(txPool.getTransactionPool().size()+"\n\n");
                 break;
             
             default:
-                System.out.println("The selection is invalid!");
+                System.out.println("The selection is invalid!\n\n");
                     
                
             }

@@ -46,7 +46,6 @@ public class MC extends Channel {
 		else if(M.getType().equals("RESPONSE_TRANSACTION_POOL")) {
 			responseTransactionPool(M, this.blockchain, this.txPool);
 		}
-		System.out.println("ENDEREÇO: "+dPacket.getAddress().getHostAddress());
 		sendMessage(("QUERY_LATEST").getBytes(),dPacket.getAddress().getHostAddress(),dPacket.getPort());
 		try{Thread.sleep(500);}catch(Exception e){e.printStackTrace();}
 		broadcastTransactionPool(txPool, this.peers);

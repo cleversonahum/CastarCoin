@@ -51,7 +51,7 @@ public class Transaction implements Serializable {
             return false;
         }
         else if(!hasValidTxIns(transaction, avaliateUnspentTxOuts)) {
-            System.out.println("Some txIns are Invalid in Transaction: " + transaction.id);
+            //System.out.println("Some txIns are Invalid in Transaction: " + transaction.id);
             return false;
         }
         else if(totalTxOutValues(transaction) != totalTxInValues(transaction, avaliateUnspentTxOuts)) {
@@ -110,7 +110,7 @@ public class Transaction implements Serializable {
                 referencedTxOut = avaliateUnspentTxOuts.get(i);
                 
         if(referencedTxOut == null) {        
-            System.out.println("Referenced txOut not found");
+            //System.out.println("rerenced Out not found");
             return false;  
         }
 

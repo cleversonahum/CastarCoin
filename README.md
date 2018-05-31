@@ -8,4 +8,4 @@ CastarCoin: A simple cryptocurrency project using blockchain concepts and JAVA
 ## Run
 ```java Main```
 
-Based on (Naivecoin Tutorial)[https://lhartikk.github.io/] and (Code)[https://github.com/lhartikk/naivecoin]
+Based on [Naivecoin Tutorial](https://lhartikk.github.io/) and [Code](https://github.com/lhartikk/naivecoin)
